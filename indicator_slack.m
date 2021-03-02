@@ -69,15 +69,15 @@ switch sim_type
     case 2 % CTP
         % in case of CTP, duration is a n x 2 column vector next to DSM with lower/upper range
         % return with first and last mode's results
-        NSLACK = [NSLACK(:,1);NSLACK(:,num_modes)]; % return calculated value (number of activities with positive total float)
-        PCTSLACK = [PCTSLACK(:,1);PCTSLACK(:,num_modes)]; % percent of activities with positive total float (slack)
-        XSLACK = [XSLACK(:,1);XSLACK(:,num_modes)]; % average fotal float (slack)
-        MAXCPL = [MAXCPL(:,1);MAXCPL(:,num_modes)];
-        TOTSLACK_R = [TOTSLACK_R(:,1);TOTSLACK_R(:,num_modes)]; % total float (slack) ratio
-        XSLACK_R = [XSLACK_R(:,1);XSLACK_R(:,num_modes)]; % average float (slack) ratio
-        NFREESLK = [NFREESLK(:,1);NFREESLK(:,num_modes)]; % number of activities with positive free float
-        PCTFREESLK = [PCTFREESLK(:,1);PCTFREESLK(:,num_modes)]; % percent of activities with positive free float (slack)
-        XFREESLK = [XFREESLK(:,1);XFREESLK(:,num_modes)]; % average free float per activity (slack)
+        NSLACK = [NSLACK(:,1),NSLACK(:,num_modes)]; % return calculated value (number of activities with positive total float)
+        PCTSLACK = [PCTSLACK(:,1),PCTSLACK(:,num_modes)]; % percent of activities with positive total float (slack)
+        XSLACK = [XSLACK(:,1),XSLACK(:,num_modes)]; % average fotal float (slack)
+        MAXCPL = [MAXCPL(:,1),MAXCPL(:,num_modes)];
+        TOTSLACK_R = [TOTSLACK_R(:,1),TOTSLACK_R(:,num_modes)]; % total float (slack) ratio
+        XSLACK_R = [XSLACK_R(:,1),XSLACK_R(:,num_modes)]; % average float (slack) ratio
+        NFREESLK = [NFREESLK(:,1),NFREESLK(:,num_modes)]; % number of activities with positive free float
+        PCTFREESLK = [PCTFREESLK(:,1),PCTFREESLK(:,num_modes)]; % percent of activities with positive free float (slack)
+        XFREESLK = [XFREESLK(:,1),XFREESLK(:,num_modes)]; % average free float per activity (slack)
         
         
     case 3 % DTP

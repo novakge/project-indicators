@@ -44,13 +44,13 @@ end
 
 function test_SLACK_002(testCase) % for CTP
 [NSLACK_act,PCTSLACK_act,XSLACK_act,XSLACK_R_act,TOTSLACK_R_act,MAXCPL_act,NFREESLK_act,PCTFREESLK_act,XFREESLK_act] = indicator_slack(testCase.TestData.SLACK_002_1,testCase.TestData.SLACK_002_2,testCase.TestData.SLACK_002_3,testCase.TestData.SLACK_002_4);
-[NSLACK_exp,PCTSLACK_exp,XSLACK_exp,XSLACK_R_exp,TOTSLACK_R_exp,MAXCPL_exp,NFREESLK_exp,PCTFREESLK_exp,XFREESLK_exp] = deal(22,0.733,3,0.142,4.285,21,19,0.633,Inf);
+[NSLACK_exp,PCTSLACK_exp,XSLACK_exp,XSLACK_R_exp,TOTSLACK_R_exp,MAXCPL_exp,NFREESLK_exp,PCTFREESLK_exp,XFREESLK_exp] = deal([22,22],[0.733,0.733],[3,8.666],[0.142,0.131],[1.0476,0.3333],[21,66],[18,18],[0.6,0.6],[2.333,7.133]);
 verifyEqual(testCase,[NSLACK_act,PCTSLACK_act,XSLACK_act,XSLACK_R_act,TOTSLACK_R_act,MAXCPL_act,NFREESLK_act,PCTFREESLK_act,XFREESLK_act], [NSLACK_exp,PCTSLACK_exp,XSLACK_exp,XSLACK_R_exp,TOTSLACK_R_exp,MAXCPL_exp,NFREESLK_exp,PCTFREESLK_exp,XFREESLK_exp],'AbsTol',0.001)
 end
 
 function test_SLACK_003(testCase) % for DTP
 [NSLACK_act,PCTSLACK_act,XSLACK_act,XSLACK_R_act,TOTSLACK_R_act,MAXCPL_act,NFREESLK_act,PCTFREESLK_act,XFREESLK_act] = indicator_slack(testCase.TestData.SLACK_003_1,testCase.TestData.SLACK_003_2,testCase.TestData.SLACK_003_3,testCase.TestData.SLACK_003_4);
-[NSLACK_exp,PCTSLACK_exp,XSLACK_exp,XSLACK_R_exp,TOTSLACK_R_exp,MAXCPL_exp,NFREESLK_exp,PCTFREESLK_exp,XFREESLK_exp] = deal(22,0.733,3,0.142,4.285,21,19,0.633,Inf);
+[NSLACK_exp,PCTSLACK_exp,XSLACK_exp,XSLACK_R_exp,TOTSLACK_R_exp,MAXCPL_exp,NFREESLK_exp,PCTFREESLK_exp,XFREESLK_exp] = deal([22,17,22],[0.733,0.566,0.733],[3,3.533,8.666],[0.142,0.0929,0.131],[1.047,0.447,0.3333],[21,38,66],[18,18,18],[0.6,0.6,0.6],[2.333,4.4,7.133]);
 verifyEqual(testCase,[NSLACK_act,PCTSLACK_act,XSLACK_act,XSLACK_R_act,TOTSLACK_R_act,MAXCPL_act,NFREESLK_act,PCTFREESLK_act,XFREESLK_act], [NSLACK_exp,PCTSLACK_exp,XSLACK_exp,XSLACK_R_exp,TOTSLACK_R_exp,MAXCPL_exp,NFREESLK_exp,PCTFREESLK_exp,XFREESLK_exp],'AbsTol',0.001)
 end
 
