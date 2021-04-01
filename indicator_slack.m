@@ -1,13 +1,20 @@
 % implements various slack related indicators
 
-% example input: >> load('test_data/j301_10_NTP.mat', 'PDM', 'num_activities', 'num_modes', 'sim_type')
-% example usage: >> [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_activities, num_modes, sim_type, selected_mode)
+% example input: >> load('test_data/j301_10_NTP.mat', 'PDM', 'num_modes', 'sim_type')
+% example usage: >> [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_modes, sim_type)
 % example output: >> NSLACK = 8 ... XFREESLK = 2.67
 
-function [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_activities, num_modes, sim_type)
+function [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_modes, sim_type)
 
-% call any preprocessor here
-DSM = PDM(1:num_activities,1:num_activities); % extract DSM from PDM with the help of number of activities
+% remove any zero activity, the corresponding dependencies and demands
+DSM = PDM(1:size(PDM,1),1:size(PDM,1)); % get DSM including zero activities from PDM, number of activities = number of rows in PDM
+PDM(diag(DSM)==0,:)=[]; % remove zero activities and their dependencies from PDM
+PDM(:,diag(DSM)==0)=[]; % remove all zero activities, its dependencies and demands from PDM
+DSM = PDM(:,1:size(PDM,1)); % get DSM without zero activities from PDM after cleanup is done
+
+% get number of non-zero activities
+num_activities = size(DSM,1);
+
 DSM = triu(DSM); % consider only upper triangle matrix
 
 % get TD for all modes
