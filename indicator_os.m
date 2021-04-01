@@ -2,7 +2,7 @@ function os = indicator_os(DSM)
 
 DSM = triu(DSM); % consider only upper triangle matrix
 
-num_activities = size(DSM,1); % number of activities (n)
+num_activities = sum(diag(DSM)>0); % number of activities (non-zero values in the diagonal)
 
 T = DSM ^ (num_activities-1); % compute transitive closure with matrix multiplication
 

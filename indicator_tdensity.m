@@ -2,7 +2,7 @@
 function tdensity = indicator_tdensity(DSM)
 
 % todo call standard DSM preprocessor here
-num_activities = size(DSM,1); % number of activities (n)
+num_activities = sum(diag(DSM)>0); % number of activities (non-zero values in the diagonal)
 
 upper_triangle = triu(DSM,1); % consider only upper triangle without activities in diagonal
 

@@ -2,7 +2,7 @@
 function c = indicator_c(DSM)
 
 % todo call standard DSM preprocessor here
-n = size(DSM,1); % number of activities (n)
+n = sum(diag(DSM)>0); % number of activities (non-zero values in the diagonal)
 a = numel(DSM(DSM==1))-n; % number of arcs (a) 
 
 if (mod(n,2) == 0) % when n is even
