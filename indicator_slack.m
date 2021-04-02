@@ -42,7 +42,7 @@ XFREESLK = zeros(1,num_modes);
 for j=1:num_modes
     
     TD_temp = TD(:,j); % select the actual mode of duration from column 'w'
-    [TPT(:,j),EST(:,j),EFT(:,j),LST(:,j),LFT(:,j)]=tptfast(DSM,TD_temp); % store the results for each mode
+    [TPT(:,j),EST(:,j),EFT(:,j),LST(:,j),LFT(:,j)]=tptfast(double(DSM),double(TD_temp)); % store the results for each mode
     TF(:,j) = LST(:,j) - EST(:,j); % calculate total float (slack) for each activity (Late Start Date - Late Finish Date)
     NSLACK(1,j) = sum(TF(:,j)>0); % return calculated value (number of activities with positive total float)
     PCTSLACK(1,j) = NSLACK(1,j) / double(num_activities); % percent of activities with positive total float (slack)

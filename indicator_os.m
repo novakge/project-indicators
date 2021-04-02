@@ -4,7 +4,7 @@ DSM = triu(DSM); % consider only upper triangle matrix
 
 num_activities = sum(diag(DSM)>0); % number of activities (non-zero values in the diagonal)
 
-T = DSM ^ (num_activities-1); % compute transitive closure with matrix multiplication
+T = double(DSM) ^ (num_activities-1); % compute transitive closure with matrix multiplication
 
 num_arcs_all = numel(T(T>0)) - num_activities; % number of arcs + transitive arcs
 
