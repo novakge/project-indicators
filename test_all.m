@@ -1,7 +1,0 @@
-run(indicator_c_test)
-run(indicator_cnc_test)
-run(indicator_duration_test)
-run(indicator_os_test)
-run(indicator_slack_test)
-run(indicator_tdensity_test)
-run(indicator_xdensity_test)
