@@ -1,10 +1,10 @@
 % implements various slack related indicators
 
-% example input: >> load('test_data/j301_10_NTP.mat', 'PDM', 'num_modes', 'sim_type')
-% example usage: >> [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_modes, sim_type)
+% example input: >> load('test_data/j301_10_NTP.mat', 'PDM', 'num_modes')
+% example usage: >> [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_modes)
 % example output: >> NSLACK = 8 ... XFREESLK = 2.67
 
-function [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_modes, sim_type)
+function [NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK] = indicator_slack(PDM, num_modes)
 
 % remove any zero activity, the corresponding dependencies and demands
 DSM = PDM(:,1:size(PDM,1)); % get DSM including zero activities from PDM, number of activities = number of rows in PDM
@@ -57,43 +57,4 @@ for j=1:num_modes
     
 end
 
-% filter results depending on simulation type e.g. CTP,DTP,NTP
-switch sim_type
-    
-    case 1 % NTP
-        % in case of NTP, duration is a n x 1 column vector next to DSM
-        % return with first mode's results
-        NSLACK = NSLACK(:,1); % return calculated value (number of activities with positive total float)
-        PCTSLACK = PCTSLACK(:,1); % percent of activities with positive total float (slack)
-        XSLACK = XSLACK(:,1); % average total float (slack)
-        MAXCPL = MAXCPL(:,1); % or max(EFT)
-        TOTSLACK_R = TOTSLACK_R(:,1); % total float (slack) ratio
-        XSLACK_R = XSLACK_R(:,1); % average float (slack) ratio
-        NFREESLK = NFREESLK(:,1); % number of activities with positive free float
-        PCTFREESLK = PCTFREESLK(:,1); % percent of activities with positive free float (slack)
-        XFREESLK = XFREESLK(:,1); % average free float per activity (slack)
-        
-    case 2 % CTP
-        % in case of CTP, duration is a n x 2 column vector next to DSM with lower/upper range
-        % return with first and last mode's results
-        NSLACK = [NSLACK(:,1),NSLACK(:,num_modes)]; % return calculated value (number of activities with positive total float)
-        PCTSLACK = [PCTSLACK(:,1),PCTSLACK(:,num_modes)]; % percent of activities with positive total float (slack)
-        XSLACK = [XSLACK(:,1),XSLACK(:,num_modes)]; % average fotal float (slack)
-        MAXCPL = [MAXCPL(:,1),MAXCPL(:,num_modes)];
-        TOTSLACK_R = [TOTSLACK_R(:,1),TOTSLACK_R(:,num_modes)]; % total float (slack) ratio
-        XSLACK_R = [XSLACK_R(:,1),XSLACK_R(:,num_modes)]; % average float (slack) ratio
-        NFREESLK = [NFREESLK(:,1),NFREESLK(:,num_modes)]; % number of activities with positive free float
-        PCTFREESLK = [PCTFREESLK(:,1),PCTFREESLK(:,num_modes)]; % percent of activities with positive free float (slack)
-        XFREESLK = [XFREESLK(:,1),XFREESLK(:,num_modes)]; % average free float per activity (slack)
-        
-        
-    case 3 % DTP
-        % in case of DTP, duration is a n x w column vector next to DSM 
-        % return with all modes' results (the default calculation)
-        
-        
-    otherwise
-        
-        fprintf('Not a valid TP: only 1=NTP, 2=CTP, 3=DTP, simulation types are supported!\n');
-        
 end
