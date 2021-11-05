@@ -3,6 +3,7 @@ DSM=logical(triu(DSM));
 DSM(diag(DSM)==0,:)=0;
 DSM(:,diag(DSM)==0)=0;
 L=zeros(size(DSM,1),2);
+stage = 0;
 
 M=zeros(size(DSM,1),1);
 dsm=DSM(diag(DSM)==1,diag(DSM)==1);
