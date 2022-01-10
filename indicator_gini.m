@@ -1,7 +1,7 @@
 % Gini coefficient shows how total work content (resource demand * duration) are distributed among tasks
-% input 1: PDM with renewable resources and single mode
+% input 1: PDM with renewable resources and a selected single mode
 % input 2: number of renewable resources
-% example 1: >> gini = indicator_gini(PDM , 4)
+% example: >> gini = indicator_gini(PDM, num_r_resources)
 
 function gini = indicator_gini(PDM, num_r_resources)
 
@@ -12,51 +12,26 @@ function gini = indicator_gini(PDM, num_r_resources)
 % PDM(:,diag(DSM)==0)=[]; % remove all zero activities, its dependencies and demands from PDM
 % DSM = PDM(:,1:size(PDM,1)); % get DSM without zero activities from PDM after cleanup is done
 
-% check if input is a multiproject (cell)
-if iscell(PDM)
-    num_projects = size(PDM,1);
-%     for i=1:num_projects
-%         num_activities(1,i) = size(PDM{i},1);
-%     end
-    num_activities = size(PDM{1},1);
-else
-    num_projects = 1;
-    num_activities = size(PDM,1);
+n = size(PDM,1); % number of rows gives total number of activities of the (multi)project
+r = num_r_resources; % rename only
+
+% TODO handle case when number of resources are varied amongst projects
+
+RD = PDM(:,n+2+1:n+2+r); % extract resource domain, a (n x r) matrix
+
+TD = PDM(:,n+1); % extract time domain, a (n x 1) vector
+
+work_content = zeros(n,r); % pre-allocate / reset vector for RD*TD values
+
+for j=1:r % go through each resource type
+    work_content(:,j) = RD(:,j) .* TD(:,1); % multiply resource demands with durations
 end
 
-n = num_activities; % copy
-% TODO handle variable task sizes
-r = num_r_resources; % copy
-% TODO handle variable resource sizes
-all_values = [];
+work_content = sum(work_content,2); % sum up RD * TD for all resource types
+work_content = sort(work_content); % sort rows in ascending order
 
-for prj=1:num_projects % for all projects
-    
-    if iscell(PDM) % is a multiproject cell
-        PDM_temp = cell2mat(PDM(prj)); % copy actual project
-    else
-        PDM_temp = PDM;
-    end
-    
-    RD = PDM_temp(:,n+2+1:n+2+r); % extract resource domain, a (n x r) matrix
-    
-    TD = PDM_temp(:,n+1); % extract time domain, a (n x 1) vector
-    
-    value = zeros(n,r); % pre-allocate / reset vector for RD*TD values
-    
-    for j=1:r % go through each resource type
-        value(:,j) = RD(:,j) .* TD(:,1); % multiply resource demands with durations
-    end
-    
-    value = sum(value,2); % sum up RD * TD for all resource types
-    
-    all_values = [all_values; value]; % put result to the end of the actual column vector
-end
-
-all_values = sort(all_values); % sort rows in ascending order
-num_values = num_projects*num_activities; % calculate all elements
-freq = (num_values:-1:1)'; % create "n+1-i" column vector in advance to simplify calculation
+freq = (n:-1:1)'; % create "n+1-i" column vector in advance to simplify calculation
 
 % equation details: https://en.wikipedia.org/wiki/Gini_coefficient
-gini = num_values + 1 - 2*( sum(all_values .* freq) ./ sum(all_values,1) );
-gini = gini/num_values;
+gini = n + 1 - 2 * ( sum(work_content .* freq) ./ sum(work_content,1) );
+gini = gini/n;
