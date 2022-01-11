@@ -15,15 +15,6 @@
 % X_ilt =  { 1 if task_i of project_l is active at time t
 %          { 0 if task_i of project_l is inactive at time t
 
-% TODO NARLF
-% Normalized Average Resource Loading Factor (NARLF)
-% Similarly, but divide (num_projects * TPT_max) for all projects instead of only TPT_l
-% This formulation normalizes the ARLF over the problem's critical path duration rather than over each individual project's CP duration
-
-% TODO VA-NARLF
-% Variance of Normalized Average Resource Loading Factor (NARLF)
-
-
 function arlf = indicator_arlf(PSM, num_r_resources)
 
 % remove zero tasks, their dependencies and demands
@@ -65,7 +56,7 @@ end
 % hint: when no debug needed (detailed resource function table), "resource_profile = zeros(1,TPT)" and in the loop, "resource_profile(t)" can be used for an aggregate row vector of resource profiles
 % resource_profile
 
-arlf = sum(resource_profile,'all') / TPT * double(r);
+arlf = sum(resource_profile,'all') / TPT / double(r);
 
 % check for NaN, Inf aftwerards and notify user
 if ( isinf(arlf) || isnan(arlf) )
