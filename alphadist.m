@@ -16,4 +16,9 @@ alpha_max = (y - v_avg) * eqt + abs(x - v_avg + mod((S-n*x),(y-x))) + (v_avg - x
 
 alphadist = alpha_w / alpha_max;
 
+% return zero for NaN
+if isnan(alphadist)
+    alphadist = 0;
+end
+
 end
