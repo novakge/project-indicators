@@ -66,21 +66,22 @@ TD=PSM(:,n+1); %n-by-1 vector
 PCTR=sum(RD>0,1)/n; % percent of activities that require the given resource type
 RF=double(sum(PCTR,2)/r); % resource factor
 RU=sum(RD>0,2); % resource use 
-RU=mean(RU); % average version of Demeulemeester, 2003
+%RU=mean(RU); % average version of Demeulemeester, 2003
 ak=constr(3:3+r-1); % 1-by-r vector, the constraints are considered as constant during the project, the first 2 constraint are omitted: the first constraint belongs to time, the second belongs to cost
 DMND=sum(PSM(:,n+2+1:n+2+r),1)./sum(PSM(:,n+2+1:n+2+r)>0,1); % average demand from each renewable resource
 XDMND=mean(DMND); % average version of Patterson, 1976
 RC=DMND./ak; % resource constrainedness for each resource type
-RC=mean(RC); % average version of Patterson, 1976
+%RC=mean(RC); % average version of Patterson, 1976
 rkmin=max(PSM(:,n+2+1:n+2+r),[],1); % 1-by-r vector, maximum individual resource demand for each resource type
 
   
 %% INDICATORS for an earliest start SCHEDULE
+
 UTIL=(TD'*RD)./(TPT*ak);
 XUTIL=mean(UTIL); % average version of Patterson, 1976 (XUTIL)
 rkmax=max(RESFUNC,[],1); % maximum resource demand for each resource type 
 RS=(ak-rkmin)./(rkmax-rkmin); % resource strength
-RS=mean(RS); % average version of Kolisch, 1995
+%RS=mean(RS); % average version of Kolisch, 1995
 TCON=UTIL./sum(RD>0,1); % Resource Constrainedness Over Time
 XCON=mean(TCON); % average version Patterson 1976 (XCON)
 ExResReq=0; % Excess Resource Requirement
