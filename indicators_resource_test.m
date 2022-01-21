@@ -21,7 +21,7 @@ end
 
 function test_RES_001(testCase)
 [RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL,TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT] = indicators_resource(testCase.TestData.RES_001,testCase.TestData.RES_002,testCase.TestData.RES_003);
-actSolution = {RF;RU;XDMND;RS;RC;XUTIL;XCON;TOTOFACT;TOTUFACT}; % get results as a cell as dimensions might differ
+actSolution = {RF;mean(RU);XDMND;mean(RS);mean(RC);XUTIL;XCON;TOTOFACT;TOTUFACT}; % get results as a cell as dimensions might differ
 expSolution = {0.5083;2.0333;5.8168;0.5447;0.3556;0.555;0.0378;0.6302;3.651}; % see also results of "Datasets with Parameters and BKS (BVersion 3 - 2017).xlsx"
 verifyEqual(testCase,actSolution,expSolution,'AbsTol',0.001)
 end
