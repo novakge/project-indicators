@@ -5,11 +5,14 @@ DSM(:,diag(DSM)==0)=0;
 dsm=DSM(diag(DSM)==1,diag(DSM)==1);
 i1=size(dsm,1);
 n=i1;
-A=numel(dsm(dsm==1))-size(dsm,1); %number of arcs
+A=numel(dsm(dsm==1))-size(dsm,1); % number of arcs
 L=pl(dsm);
 l=L(:,1);
 m=max(l);
 i2=(m-1)/(n-1);
+if n==1
+    i2=1; % by definition
+end
 i3=0;
 W=tabulate(l);
 W=W(:,2);
