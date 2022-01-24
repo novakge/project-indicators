@@ -23,15 +23,23 @@
 % new order
 % type,filename,c,cnc,XDUR,VADUR,os,NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK,tdensity,xdensity,fr,sr,ff,num_modes,num_activities,num_r_resources,rf,mean(ru),ru,mean(pctr),pctr,xdmnd,dmnd,mean(rs),rs,mean(rc),rc,xutil,util,xcon,tcon,totofact,ofact,ufact,totufact,database
 
+clear % clear all obsolete variables
+
 % constants
 extension_filter = '*.mat'; % select extension
 directory = 'test';
 browse_dir = fullfile(directory, extension_filter); % look for all files with the extension in given subfolder
 files = dir(browse_dir);
+currdate = datestr(now,'yyyymmdd-HHMM');
+results = strcat('results-',currdate,'.csv');
+data = fopen(results,'w');
 
 % parameters
 rng = 123; % initialize random seed for reproducibility
 ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array
+
+% start to store header in file
+fprintf(data,'type;filename;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;TOTSLACK_R;MAXCPL;NFREESLK;PCTFREESLK;XFREESLK;tdensity;xdensity;fr;sr;ff;num_modes;num_activities;num_r_resources;rf;mean(ru);ru;mean(pctr);pctr;xdmnd;dmnd;mean(rs);rs;mean(rc);rc;xutil;util;xcon;tcon;totofact;ofact;ufact;totufact;database\n');
 
 % load all files in the defined folder and calculate all indicators
 for i=1:size(files)
@@ -50,6 +58,7 @@ for i=1:size(files)
     prj_ends = cumsum(num_activities(1:end));
     
     for k=1:numel(ff) % calculate indicators for each flexibility factor
+        
         % reset global PDM and extract global DSM for each flexibility version (max,min,... etc.)
         PDM_global = PDM;
         DSM_global = PDM(:,1:size(PDM,1)); % number of rows is used instead of num_activities as it can be a row vector for multiprojects
@@ -192,7 +201,32 @@ for i=1:size(files)
             [RF(j),RU{j},PCTR{j},DMND{j},XDMND(j),RS{j},RC{j},UTIL{j},XUTIL(j),TCON{j},XCON(j),OFACT{j},TOTOFACT(j),UFACT{j},TOTUFACT(j)] = indicators_resource(PSM{j},num_r_resources,constr,MAXCPL_total); % TPT_max information is given as separate PSMs are given as inputs but we need the longest CPL
         end
         
+        %% Output for each flexible structure variant
+        % write variables in order to a csv file
+        if ff(k) == 0
+            type_struct = 'max';
+        else
+            type_struct = 'min';
+        end
+        % print results into file
+        fprintf(data,'%s;%s;[%s];[%s];[%s];[%s];[%s];', type_struct,files(i).name, num2str(c), num2str(cnc), num2str(XDUR), num2str(VADUR), num2str(os));
+        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;%s;', num2str(NSLACK), num2str(PCTSLACK), num2str(XSLACK), num2str(XSLACK_R), num2str(TOTSLACK_R), num2str(MAXCPL), num2str(NFREESLK), num2str(PCTFREESLK), num2str(XFREESLK));
+        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;', num2str(tdensity), num2str(xdensity), num2str(fr), num2str(sr), num2str(ff(k)), num2str(num_modes), num2str(num_activities));
+        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;', num2str(num_r_resources), num2str(RF), num2str(mean(cell2mat(RU(:)))), num2str(cellfun(@mean, RU)), num2str(mean(cell2mat(PCTR(1,:)))), num2str(mean(cell2mat(PCTR(:)))), num2str(XDMND), num2str(cell2mat(DMND)), num2str(XRS_total), num2str(cell2mat(RS)), num2str(XRC_total), num2str(cell2mat(RC)));
+        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;', num2str(XUTIL), num2str(cell2mat(UTIL)), num2str(XCON), num2str(cell2mat(TCON)), num2str(TOTOFACT), num2str(cell2mat(OFACT)), num2str(cell2mat(UFACT)), num2str(TOTUFACT));
         
+        fprintf(data,'\n'); % begin newline
+        % database)
+        
+        % replace dot with comma (instance name)
+        % data = strrep(data, '.', ',');   % Replace . with ,
+        
+    end % loop flexibility factors
+        
+end % loop files
+
+fclose(data); % close result file
+
         %% Changelog
         % new order with extended indicators for multiproject;
         % - some resource average (xdmnd, xutil, xcon) now calculated inside
@@ -226,6 +260,3 @@ for i=1:size(files)
         % idea for flexible resources
         % add NARLF, alphas etc. in a logical way, create new order
         % multiproject version for UTIL, for local DSMs with global TPT_MAX...
-        
-    end % loop flexibility factors
-end % loop files
