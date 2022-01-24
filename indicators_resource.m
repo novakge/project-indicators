@@ -5,7 +5,7 @@
 % resfunc.m [BP,RESFUNC]=resfunc(DSM,SST,T,R)
 %
 % Example:
-% >> [RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL,TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT]=indicators_resource([1,1,24,2400,1,1;0,1,8,800,0,1],2,[-1,-1,1,1,3,1,1,9,1])
+% >> [RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL,TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT]=indicators_resource([1,1,24,2400,1,1;0,1,8,800,0,1],2,[-1,-1,1,1,3,1,1,9,1],20)
 
 %% RF: resource factor 
 % ~: the density of the resource matrix, that is a DMM
@@ -50,7 +50,7 @@
 
 
 
-function [RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL,TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT]=indicators_resource(PSM,num_r_resources,constr)
+function [RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL,TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT]=indicators_resource(PSM,num_r_resources,constr,TPT_max)
 n=size(PSM,1);
 %w=1; % number of modes (w) is 1 (one) after the PDM has been decided, the PSM has been defined
 r=num_r_resources; % number of renewable resources 
@@ -58,6 +58,13 @@ LD=PSM(:,1:n);
 RD=PSM(:,n+2+1:n+2+r); %resource domain, n-by-r matrix
 TD=PSM(:,n+1); %n-by-1 vector
 [TPT,SST]=tptfast(LD,TD); % total project time TPT (duration) - the length of the critical path - and scheduled sarting times SST using an earliest start schedule regardless the resource constraints
+
+% evaluate optional input parameter TPT_max, as in case of multiproject, we need global TPT information to calculate separate projects' indicator UTIL
+if ~exist('TPT_max', 'var')
+    TPT_max = TPT; % TPT is calculated here
+end
+
+    
 [BP,RESFUNC]=resfunc(LD,SST,TD,RD); % resource loading function
 
 
@@ -77,7 +84,7 @@ rkmin=max(PSM(:,n+2+1:n+2+r),[],1); % 1-by-r vector, maximum individual resource
   
 %% INDICATORS for an earliest start SCHEDULE
 
-UTIL=(TD'*RD)./(TPT*ak);
+UTIL=(TD'*RD)./(TPT_max*ak);
 XUTIL=mean(UTIL); % average version of Patterson, 1976 (XUTIL)
 rkmax=max(RESFUNC,[],1); % maximum resource demand for each resource type 
 RS=(ak-rkmin)./(rkmax-rkmin); % resource strength
