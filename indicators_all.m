@@ -20,8 +20,7 @@
 
 % original order from previous results XLS
 % type,filename,c,cnc,XDUR,VADUR,os,NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK,tdensity,xdensity,fr,sr,ff,num_modes,num_activities,num_r_resources,rf,mean(ru),ru,mean(pctr),pctr,mean(dmnd),dmnd,mean(rs),rs,mean(rc),rc,mean(util),util,mean(tcon),tcon,ofact,ufact,database
-% proposed new order
-% type,filename,c,cnc,XDUR,VADUR,os,NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK,tdensity,xdensity,fr,sr,ff,num_modes,num_activities,num_r_resources,rf,mean(ru),ru,mean(pctr),pctr,xdmnd,dmnd,mean(rs),rs,mean(rc),rc,xutil,util,xcon,tcon,totofact,ofact,ufact,totufact,database
+% proposed new order, see below
 
 clear % clear all obsolete variables
 
@@ -34,7 +33,7 @@ dirlist = dirlist([dirlist.isdir]); % keep only folders in list
 tf = ismember( {dirlist.name}, {'.', '..'});
 dirlist(tf) = []; % remove current and parent directory
 
-currdate = datestr(now,'yyyymmdd-HHMM');
+currdate = datestr(now,'yyyymmdd-HHMMSS');
 results = strcat('results-',currdate,'.csv');
 data = fopen(results,'w');
 
@@ -43,7 +42,10 @@ rng = 123; % initialize random seed for reproducibility
 ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array
 
 % start to store header in file
-fprintf(data,'type;filename;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;TOTSLACK_R;MAXCPL;NFREESLK;PCTFREESLK;XFREESLK;tdensity;xdensity;fr;sr;ff;num_modes;num_activities;num_r_resources;rf;mean(ru);ru;mean(pctr);pctr;xdmnd;dmnd;mean(rs);rs;mean(rc);rc;xutil;util;xcon;tcon;totofact;ofact;ufact;totufact;database\n');
+fprintf(data,'type;filename;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;TOTSLACK_R;MAXCPL;NFREESLK;PCTFREESLK;XFREESLK;tdensity;xdensity;fr;sr;ff;num_modes;num_activities;num_r_resources;rf;mean(ru);ru;mean(pctr);pctr;xdmnd;dmnd;mean(rs);rs;mean(rc);rc;xutil;util;xcon;tcon;totofact;ofact;ufact;totufact;database;');
+% extended indicators list
+fprintf(data,'num_projects;sum(num_activities);a_RS;alpha_i1;alpha_i2;arlf;narlf;narlf_;c_total;cnc_total;DMND_total;gini;gini_total;i1;i1_total;i2;i2_total;i3;i3_total;i4;i4_total;i5;i5_total;i6;i6_total;MAXCPL;MAXCPL_total;NFREESLK_total;NSLACK_total;OFACT_total;os_total;PCTFREESLK_total;PCTR_total;PCTSLACK_total;RC_total;RF_total;RS_total;RU_total;TCON_total;tdensity_total;TOTOFACT_total; TOTSLACK_R_total;TOTUFACT_total;UFACT_total;UTIL_total;VADUR_total;XCON_total;xdensity_total;XDMND_total;XDUR_total;XFREESLK_total;XPCTR_total;XRC_total;XRS_total;XRU_total;XSLACK_R_total;XSLACK_total;XUTIL_total\n'); % stop with newline
+
 
 
 for d=1:size(dirlist,1) % go through all directories
@@ -90,6 +92,7 @@ for d=1:size(dirlist,1) % go through all directories
             % PDM_minmax = ceil(triu(PDM(:,1:size(PDM,1)),1))+diag(floor(diag(PDM))); % tasks-out / dependencies-in
             
             % re-count number of tasks remaining for each original project after flexible ones will be removed based on original structure
+            num_activities_flex = []; % reset every loop to avoid leftovers at original indices when projects are removed
             for j=1:num_projects
                 num_activities_flex(j) = nnz(diag(PDM_global(prj_starts(j):prj_ends(j),prj_starts(j):prj_ends(j))));
             end
@@ -118,7 +121,7 @@ for d=1:size(dirlist,1) % go through all directories
             CD  = {};
             
             % get all separate domains of each project
-            for j = 1:num_projects
+            for j = 1:num_projects_flex
                 DSM{j} = PDM_global(prj_starts_flex(j):prj_ends_flex(j),prj_starts_flex(j):prj_ends_flex(j)); % get single DSMs for all project
                 TD{j}  = PDM_global(prj_starts_flex(j):prj_ends_flex(j),n_flex+1); % get single (n x 1) time domain matrices for all projects
                 CD{j}  = PDM_global(prj_starts_flex(j):prj_ends_flex(j),n_flex+2); % get single (n x 1) cost domain matrices for all projects
@@ -130,7 +133,18 @@ for d=1:size(dirlist,1) % go through all directories
             
             % start calculating different indicators
             %% local DSM based indicators (logical structure) calculated for individual projects
-            for j=1:num_projects
+            i1=0;
+            i2=0;
+            i3=0;
+            i4=0;
+            i5=0;
+            i6=0;
+            c=0;
+            cnc=0;
+            os=0;
+            xdensity=0;
+            tdensity=0;
+            for j=1:num_projects_flex
                 [i1(j),i2(j),i3(j),i4(j),i5(j),i6(j)] = indicators(DSM{j});
                 c(j) = indicator_c(DSM{j});
                 cnc(j) = indicator_cnc(DSM{j});
@@ -157,7 +171,19 @@ for d=1:size(dirlist,1) % go through all directories
             %% local PDM based indicators calculated for individual projects
             
             % time and resource related indicators
-            for j=1:num_projects
+            XDUR=0;
+            VADUR=0;
+            NSLACK=0;
+            PCTSLACK=0;
+            XSLACK=0;
+            XSLACK_R=0;
+            TOTSLACK_R=0;
+            MAXCPL=0;
+            NFREESLK=0;
+            PCTFREESLK=0;
+            XFREESLK=0;
+            gini=0;
+            for j=1:num_projects_flex
                 % activity duration related
                 [XDUR(j),VADUR(j)] = indicator_duration(PDM_local{j},1);
                 
@@ -185,7 +211,7 @@ for d=1:size(dirlist,1) % go through all directories
             %% PSM based indicators (if it is a multimode, select one (first) mode only)
             
             % prepare PSM by selecting first mode in PDM cells (formally, because currently we have only single mode multiproject databases)
-            for j = 1:num_projects
+            for j=1:num_projects_flex
                 % merge to separate PDMs
                 PSM{j} = [DSM{j} TD{j}(:,1) CD{j}(:,1) RD{j}(:,1:num_modes:num_modes*num_r_resources)]; % select first modes for TD,CD,RD
             end
@@ -206,7 +232,22 @@ for d=1:size(dirlist,1) % go through all directories
             XRC_total=mean(RC_total); %
             
             % local calculations
-            for j = 1:num_projects
+            RF=0;
+            RU={};
+            PCTR={};
+            DMND={};
+            XDMND=0;
+            RS={};
+            RC={};
+            UTIL={};
+            XUTIL=0;
+            TCON={};
+            XCON=0;
+            OFACT={};
+            TOTOFACT=0;
+            UFACT={};
+            TOTUFACT=0;
+            for j = 1:num_projects_flex
                 [RF(j),RU{j},PCTR{j},DMND{j},XDMND(j),RS{j},RC{j},UTIL{j},XUTIL(j),TCON{j},XCON(j),OFACT{j},TOTOFACT(j),UFACT{j},TOTUFACT(j)] = indicators_resource(PSM{j},num_r_resources,constr,MAXCPL_total); % TPT_max information is given as separate PSMs are given as inputs but we need the longest CPL
             end
             
@@ -222,15 +263,18 @@ for d=1:size(dirlist,1) % go through all directories
             % section #1
             fprintf(data,'%s;%s;[%s];[%s];[%s];[%s];[%s];', type_struct,filelist(i).name, num2str(c), num2str(cnc), num2str(XDUR), num2str(VADUR), num2str(os));
             fprintf(data,'[%s];[%s];[%s];[%s];[%s];[%s];[%s];[%s];[%s];', num2str(NSLACK), num2str(PCTSLACK), num2str(XSLACK), num2str(XSLACK_R), num2str(TOTSLACK_R), num2str(MAXCPL), num2str(NFREESLK), num2str(PCTFREESLK), num2str(XFREESLK));
-            fprintf(data,'[%s];[%s];%s;%s;%s;%s;[%s];', num2str(tdensity), num2str(xdensity), num2str(fr), num2str(sr), num2str(ff(k)), num2str(num_modes), num2str(num_activities));
+            fprintf(data,'[%s];[%s];%s;%s;%s;%s;[%s];', num2str(tdensity), num2str(xdensity), num2str(fr), num2str(sr), num2str(ff(k)), num2str(num_modes), num2str(num_activities_flex));
             fprintf(data,'%s;[%s];%s;[%s];%s;[%s];[%s];[%s];%s;[%s];%s;[%s];', num2str(num_r_resources), num2str(RF), num2str(mean(cell2mat(RU(:)))), num2str(cellfun(@mean, RU)), num2str(mean(cell2mat(PCTR(1,:)))), num2str(mean(cell2mat(PCTR(:)))), num2str(XDMND), num2str(cell2mat(DMND)), num2str(XRS_total), num2str(cell2mat(RS)), num2str(XRC_total), num2str(cell2mat(RC)));
             fprintf(data,'[%s];[%s];[%s];[%s];[%s];[%s];[%s];[%s];%s;', num2str(XUTIL), num2str(cell2mat(UTIL)), num2str(XCON), num2str(cell2mat(TCON)), num2str(TOTOFACT), num2str(cell2mat(OFACT)), num2str(cell2mat(UFACT)), num2str(TOTUFACT), dirlist(d).name);
             
             % section #2
-            %fprintf(data,'%s;%s;%s;',num2str(xxx)); % further indicators go here
-            fprintf(data,'\n'); % stop with a newline
-            
-            
+            fprintf(data,'%s;%s;%s;%s;%s;', num2str(num_projects_flex), num2str(sum(num_activities_flex)),num2str(a_RS),num2str(alpha_i1),num2str(alpha_i2));
+            fprintf(data,'%s;%s;%s;%s;%s;[%s];', num2str(arlf),num2str(narlf),num2str(narlf_),num2str(c_total),num2str(cnc_total),num2str(DMND_total));
+            fprintf(data,'%s;%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;', num2str(gini),num2str(gini_total),num2str(i1),num2str(i1_total),num2str(i2),num2str(i2_total),num2str(i3),num2str(i3_total),num2str(i4),num2str(i4_total),num2str(i5),num2str(i5_total),num2str(i6),num2str(i6_total));
+            fprintf(data,'[%s];%s;%s;%s;[%s];%s;%s;[%s];%s;[%s];', num2str(MAXCPL),num2str(MAXCPL_total),num2str(NFREESLK_total),num2str(NSLACK_total),num2str(OFACT_total),num2str(os_total),num2str(PCTFREESLK_total),num2str(PCTR_total),num2str(PCTSLACK_total),num2str(RC_total));
+            fprintf(data,'%s;[%s];%s;[%s];%s;%s;%s;%s;[%s];[%s];', num2str(RF_total),num2str(RS_total),num2str(RU_total),num2str(TCON_total),num2str(tdensity_total),num2str(TOTOFACT_total),num2str(TOTSLACK_R_total),num2str(TOTUFACT_total),num2str(UFACT_total),num2str(UTIL_total));
+            fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s', num2str(VADUR_total),num2str(XCON_total),num2str(xdensity_total),num2str(XDMND_total),num2str(XDUR_total),num2str(XFREESLK_total),num2str(XPCTR_total),num2str(XRC_total),num2str(XRS_total),num2str(XRU_total),num2str(XSLACK_R_total),num2str(XSLACK_total),num2str(XUTIL_total));
+            fprintf(data,'\n'); % end with a newline
             
         end % loop flexibility factors
     end % loop files
@@ -266,7 +310,9 @@ system(strcat('convert-dot.bat' + " " + results));
         % PD Project Dedication
         
         %% TODOs
-        % num_projects, mean(num_activities)
-        % idea for flexible resources
+        % idea for flexible resources (resource dedication done by Rob V. Eynde)
         % add NARLF, alphas etc. in a logical way, create new order
         % idea of combining real-world projects into multiproject or company example comparison
+        % add different types of task removal (keeping precedence relations)
+        % add support for MPSPLIB, MISTA
+        % find out why and how to handle NaN and Inf values
