@@ -44,13 +44,18 @@ ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array
 % start to store header in file
 fprintf(data,'type;filename;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;TOTSLACK_R;MAXCPL;NFREESLK;PCTFREESLK;XFREESLK;tdensity;xdensity;fr;sr;ff;num_modes;num_activities;num_r_resources;rf;mean(ru);ru;mean(pctr);pctr;xdmnd;dmnd;mean(rs);rs;mean(rc);rc;xutil;util;xcon;tcon;totofact;ofact;ufact;totufact;database;');
 % extended indicators list
-fprintf(data,'num_projects;sum(num_activities);a_RS;alpha_i1;alpha_i2;arlf;narlf;narlf_;c_total;cnc_total;DMND_total;gini;gini_total;i1;i1_total;i2;i2_total;i3;i3_total;i4;i4_total;i5;i5_total;i6;i6_total;MAXCPL;MAXCPL_total;NFREESLK_total;NSLACK_total;OFACT_total;os_total;PCTFREESLK_total;PCTR_total;PCTSLACK_total;RC_total;RF_total;RS_total;RU_total;TCON_total;tdensity_total;TOTOFACT_total; TOTSLACK_R_total;TOTUFACT_total;UFACT_total;UTIL_total;VADUR_total;XCON_total;xdensity_total;XDMND_total;XDUR_total;XFREESLK_total;XPCTR_total;XRC_total;XRS_total;XRU_total;XSLACK_R_total;XSLACK_total;XUTIL_total\n'); % stop with newline
-
+fprintf(data,'num_projects;sum(num_activities);a_RS;alpha_i1;alpha_i2;arlf;narlf;narlf_;c_total;cnc_total;DMND_total;gini;gini_total;i1;i1_total;i2;i2_total;i3;i3_total;i4;i4_total;i5;i5_total;i6;i6_total;MAXCPL_total;NFREESLK_total;NSLACK_total;OFACT_total;os_total;PCTFREESLK_total;mean(PCTR_total);PCTR_total;PCTSLACK_total;mean(RC_total);RC_total;RF_total;mean(RS_total);RS_total;mean(RU_total);RU_total;TCON_total;tdensity_total;TOTOFACT_total;TOTSLACK_R_total;TOTUFACT_total;UFACT_total;UTIL_total;VADUR_total;XCON_total;xdensity_total;XDMND_total;XDUR_total;XFREESLK_total;XPCTR_total;XRC_total;XRS_total;XRU_total;XSLACK_R_total;XSLACK_total;XUTIL_total;');
+% extended list with mean values
+fprintf(data,'mean(c);mean(cnc);mean(XDUR);mean(VADUR);mean(os);mean(NSLACK);mean(PCTSLACK);mean(XSLACK);mean(XSLACK_R);mean(TOTSLACK_R);mean(MAXCPL);mean(NFREESLK);mean(XFREESLK);mean(tdensity);mean(xdensity);mean(RF);mean(XDMND);mean(XUTIL);mean(XCON);mean(TOTOFACT);mean(OFACT);mean(UFACT);mean(TOTUFACT);mean(DMND_total);mean(gini);mean(i2);mean(i3);mean(i4);mean(i5);mean(i6);mean(OFACT_total);mean(UFACT_total);\n'); % stop with newline
 
 
 for d=1:size(dirlist,1) % go through all directories
     browse_dir = fullfile(directory,dirlist(d).name, extension_filter); % look for all files with the extension in current subfolder
     filelist = dir(browse_dir);
+    
+    
+    % FIXME: PRELIMINARY RUN WITH randomly selected instance samples from each dataset (directory), for the final run, this must be removed!
+    % filelist = filelist(randsample(size(filelist,1),10));
     
     % load all files in the defined folder and calculate all indicators
     for i=1:size(filelist)
@@ -96,6 +101,7 @@ for d=1:size(dirlist,1) % go through all directories
             for j=1:num_projects
                 num_activities_flex(j) = nnz(diag(PDM_global(prj_starts(j):prj_ends(j),prj_starts(j):prj_ends(j))));
             end
+            num_activities_flex = nonzeros(num_activities_flex)';
             
             % then remove zero tasks and their demands + dependencies
             DSM_global = PDM_global(:,1:size(PDM_global,1)); % update DSM_global before removing tasks
@@ -271,18 +277,30 @@ for d=1:size(dirlist,1) % go through all directories
             fprintf(data,'%s;%s;%s;%s;%s;', num2str(num_projects_flex), num2str(sum(num_activities_flex)),num2str(a_RS),num2str(alpha_i1),num2str(alpha_i2));
             fprintf(data,'%s;%s;%s;%s;%s;[%s];', num2str(arlf),num2str(narlf),num2str(narlf_),num2str(c_total),num2str(cnc_total),num2str(DMND_total));
             fprintf(data,'%s;%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;', num2str(gini),num2str(gini_total),num2str(i1),num2str(i1_total),num2str(i2),num2str(i2_total),num2str(i3),num2str(i3_total),num2str(i4),num2str(i4_total),num2str(i5),num2str(i5_total),num2str(i6),num2str(i6_total));
-            fprintf(data,'[%s];%s;%s;%s;[%s];%s;%s;[%s];%s;[%s];', num2str(MAXCPL),num2str(MAXCPL_total),num2str(NFREESLK_total),num2str(NSLACK_total),num2str(OFACT_total),num2str(os_total),num2str(PCTFREESLK_total),num2str(PCTR_total),num2str(PCTSLACK_total),num2str(RC_total));
-            fprintf(data,'%s;[%s];%s;[%s];%s;%s;%s;%s;[%s];[%s];', num2str(RF_total),num2str(RS_total),num2str(RU_total),num2str(TCON_total),num2str(tdensity_total),num2str(TOTOFACT_total),num2str(TOTSLACK_R_total),num2str(TOTUFACT_total),num2str(UFACT_total),num2str(UTIL_total));
-            fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s', num2str(VADUR_total),num2str(XCON_total),num2str(xdensity_total),num2str(XDMND_total),num2str(XDUR_total),num2str(XFREESLK_total),num2str(XPCTR_total),num2str(XRC_total),num2str(XRS_total),num2str(XRU_total),num2str(XSLACK_R_total),num2str(XSLACK_total),num2str(XUTIL_total));
+            fprintf(data,'%s;%s;%s;[%s];%s;%s;%s;[%s];%s;%s;[%s];', num2str(MAXCPL_total),num2str(NFREESLK_total),num2str(NSLACK_total),num2str(OFACT_total),num2str(os_total),num2str(PCTFREESLK_total),num2str(mean(PCTR_total)),num2str(PCTR_total),num2str(PCTSLACK_total),num2str(mean(RC_total)),num2str(RC_total));
+            fprintf(data,'%s;%s;[%s];%s;[%s ];[%s];%s;%s;%s;%s;[%s];[%s];', num2str(RF_total),num2str(mean(RS_total)),num2str(RS_total),num2str(mean(RU_total)),num2str(RU_total),num2str(TCON_total),num2str(tdensity_total),num2str(TOTOFACT_total),num2str(TOTSLACK_R_total),num2str(TOTUFACT_total),num2str(UFACT_total),num2str(UTIL_total));
+            fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;', num2str(VADUR_total),num2str(XCON_total),num2str(xdensity_total),num2str(XDMND_total),num2str(XDUR_total),num2str(XFREESLK_total),num2str(XPCTR_total),num2str(XRC_total),num2str(XRS_total),num2str(XRU_total),num2str(XSLACK_R_total),num2str(XSLACK_total),num2str(XUTIL_total));
+           
+            % section #3 for mean values
+            fprintf(data,'%s;%s;%s;%s;%s;', num2str(mean(c)), num2str(mean(cnc)), num2str(mean(XDUR)), num2str(mean(VADUR)), num2str(mean(os)));
+            fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;', num2str(mean(NSLACK)), num2str(mean(PCTSLACK)), num2str(mean(XSLACK)), num2str(mean(XSLACK_R)), num2str(mean(TOTSLACK_R)), num2str(mean(MAXCPL)), num2str(mean(NFREESLK)), num2str(mean(XFREESLK)));
+            fprintf(data,'%s;%s;', num2str(mean(tdensity)), num2str(mean(xdensity)));
+            fprintf(data,'%s;%s;', num2str(mean(RF)), num2str(mean(XDMND)));
+            fprintf(data,'%s;%s;%s;%s;%s;%s;', num2str(mean(XUTIL)), num2str(mean(XCON)), num2str(mean(TOTOFACT)), num2str(mean(cell2mat(OFACT))), num2str(mean(cell2mat(UFACT))), num2str(mean(TOTUFACT)));
+            fprintf(data,'%s;%s;%s;%s;%s;%s;%s;', num2str(mean(DMND_total)), num2str(mean(gini)), num2str(mean(i2)),num2str(mean(i3)),num2str(mean(i4)),num2str(mean(i5)),num2str(mean(i6)));
+            fprintf(data,'%s;%s;', num2str(mean(OFACT_total)), num2str(mean(UFACT_total)));
+
+            % close
             fprintf(data,'\n'); % end with a newline
             
         end % loop flexibility factors
     end % loop files
 end % loop folders
 
+status = fclose(data); % close result file and get the status of the operation
+
 % optionally replace dot with comma (instance name)
-fclose(data); % close result file
-system(strcat('convert-dot.bat' + " " + results));
+% system(strcat('convert-dot.bat' + " " + results));
 
         %% Changelog
         % new order with extended indicators for multiproject;
@@ -316,3 +334,4 @@ system(strcat('convert-dot.bat' + " " + results));
         % add different types of task removal (keeping precedence relations)
         % add support for MPSPLIB, MISTA
         % find out why and how to handle NaN and Inf values
+        % backtest previous single project results
