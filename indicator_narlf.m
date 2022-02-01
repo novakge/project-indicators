@@ -119,7 +119,6 @@ resource_profile = zeros(1,TPT_set); % pre-allocate a row vector for resource pr
 for j=1:num_projects % for each project
     for k=1:num_r_resources % for all resources
         for i=1:num_activities(j) % for all tasks
-            for t=EST_all{j}(i)+1:EST_all{j}(i)+TD{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
             for t=EST_all{j}(i)+1:EST_all{j}(i)+TD_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
                 
                 % NARLF original version
