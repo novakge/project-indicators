@@ -49,36 +49,41 @@ prj_starts = cumsum([1,num_activities(1:end-1)]); % starting with 1 for the firs
 prj_ends = cumsum(num_activities(1:end));
 
 % get single DSMs from the PSM superset
-DSM = {};
+DSM_all = {};
 for j = 1:num_projects
-    DSM{j} = PSM(prj_starts(j):prj_ends(j),prj_starts(j):prj_ends(j)); % get single DSMs for all project
+    DSM_all{j} = PSM(prj_starts(j):prj_ends(j),prj_starts(j):prj_ends(j)); % get single DSMs for all project
 end
 
 % get single RDs and TDs from the PSM superset
-RD = {};
-TD = {};
+RD_all = {};
+TD_all = {};
 for j = 1:num_projects
-    RD{j} = PSM(prj_starts(j):prj_ends(j),n+2+1:n+2+r); % get single (n x r) resource domain matrices for all projects
-    TD{j} = PSM(prj_starts(j):prj_ends(j),n+1); % get single (n x 1) time domain matrices for all projects
+    RD_all{j} = PSM(prj_starts(j):prj_ends(j),n+2+1:n+2+r); % get single (n x r) resource domain matrices for all projects
+    TD_all{j} = PSM(prj_starts(j):prj_ends(j),n+1); % get single (n x 1) time domain matrices for all projects
 end
 
 % get DSM superset from PSM/PDM superset
 DSM_set = PSM(:,1:n); % get superset (n x n) design structure matrices
-TD_set = PSM(:,n+1); % get superset (n x 1) time domain matrices
-RD_set = PSM(:,n+2+1:n+2+r); % get superset (n x 1) resource domain matrices
+TD_set  = PSM(:,n+1); % get superset (n x 1) time domain matrices
+RD_set  = PSM(:,n+2+1:n+2+r); % get superset (n x 1) resource domain matrices
 
 % calculate TPT (duration) as the length of the critical path (CP) and EST as earliest start schedule (time-only analysis)
-TPT = [];
-EST = [];
-[TPT,EST]=tptfast(DSM_set,TD_set); % for the whole (multi)project or portfolio
+TPT_set = [];
+EST_set = [];
 
-% calculate TPT for each project for the old (N)ARLF version
+% calculate TPT for each project for the old (N)ARLF version and for non-zero release dates
 TPT_all = {};
 for j = 1:num_projects % for each project
-    [TPT_all{j},EST_all{j}] = tptfast(DSM{j},TD{j});
+    [TPT_all{j},EST_all{j}] = tptfast(DSM_all{j},TD_all{j});
+    EST2{j} = EST_all{j} + release_dates(j); % consider release date of projects
+    TPT_all{j} = TPT_all{j} + release_dates(j);
 end
 
-% TODO: take non-zero project release dates into account for the scheduling
+% create multiproject TPT and EST from individual projects
+EST_set = cat(1,EST_all{:});
+EST2_set = cat(1,EST2{:});
+[TPT_set,~,~] = tptsst(DSM_set,TD_set,EST_set);
+
 
 % ARLF original version
 arlf_all = {}; % pre-allocate storage for ARLF values
@@ -90,16 +95,16 @@ for j=1:num_projects % for each project
         
         for i=1:num_activities(j) % for all tasks
             
-            for t=EST_all{j}(i)+1:EST_all{j}(i)+TD{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
+            for t=EST_all{j}(i)+1:EST_all{j}(i)+TD_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
                 
                 % ARLF original version
                 
                 if (t <= (release_dates(j) + TPT_all{j}/2)) % t is in first half, consider as negative
                     % remark: +1 for non-zero release dates not used here
                     % remark: rounding up TPT_j/2 is not used here as in Van Eynde (2020)
-                    res_profile(t) = res_profile(t) + RD{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
+                    res_profile(t) = res_profile(t) + RD_all{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
                 else % t is in second half, consider as positive
-                    res_profile(t) = res_profile(t) + RD{j}(i,k); % add resource demand(s) of task_i;
+                    res_profile(t) = res_profile(t) + RD_all{j}(i,k); % add resource demand(s) of task_i;
                 end
             end 
         end
@@ -110,19 +115,20 @@ for j=1:num_projects % for each project
 end
 
 % NARLF original version
-resource_profile = zeros(1,TPT); % pre-allocate a row vector for resource profile(s), for all tasks
+resource_profile = zeros(1,TPT_set); % pre-allocate a row vector for resource profile(s), for all tasks
 for j=1:num_projects % for each project
     for k=1:num_r_resources % for all resources
         for i=1:num_activities(j) % for all tasks
             for t=EST_all{j}(i)+1:EST_all{j}(i)+TD{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
+            for t=EST_all{j}(i)+1:EST_all{j}(i)+TD_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
                 
                 % NARLF original version
                 
                 if (t <= (release_dates(j) + ceil(TPT_all{j}/2) + 1)) % t is in first half, consider as negative; +1 for non-zero release dates
                     % remark: rounding up TPT/2 is not defined in the original equation (Browning et al., 2010), but used here to align with existing results in literature (Van Eynde, 2020). 
-                    resource_profile(t) = resource_profile(t) + RD{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
+                    resource_profile(t) = resource_profile(t) + RD_all{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
                 else % t is in second half, consider as positive
-                    resource_profile(t) = resource_profile(t) + RD{j}(i,k); % add resource demand(s) of task_i;
+                    resource_profile(t) = resource_profile(t) + RD_all{j}(i,k); % add resource demand(s) of task_i;
                 end
             end
         end
@@ -132,12 +138,12 @@ end
 
 % NARLF' improved version (here as NARLF_)
 % build complete resource profile as checking EST is not accurate enough
-resource_profile_ = zeros(1,TPT); % pre-allocate a row vector for resource profile(s), for all tasks
+resource_profile_ = zeros(1,TPT_set); % pre-allocate a row vector for resource profile(s), for all tasks
 for k=1:num_r_resources % for all resources
     for i=1:n % for all tasks
-        for t=EST(i)+1:EST(i)+TD_set(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
+        for t=EST_set(i)+1:EST_set(i)+TD_set(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
 
-            if (t <= min(release_dates) + 1 + ceil(TPT/2)) % t is in first half, consider as negative; +1 for non-zero release dates
+            if (t <= min(release_dates) + 1 + ceil(TPT_set/2)) % t is in first half, consider as negative; +1 for non-zero release dates
                 resource_profile_(t) = resource_profile_(t) + RD_set(i,k) * (-1); % subtract resource demand(s) of task_i;
             else % t is in second half, consider as positive
                 resource_profile_(t) = resource_profile_(t) + RD_set(i,k); % add resource demand(s) of task_i;
@@ -156,7 +162,7 @@ arlf = sum(cell2mat(arlf_all),'all') / (num_projects);
 narlf = sum(resource_profile,'all') / (num_projects * max(cell2mat(TPT_all)) * double(r));
 
 % improved NARLF'
-narlf_ = sum(resource_profile_,'all') / (num_projects * TPT * double(r));
+narlf_ = sum(resource_profile_,'all') / (num_projects * TPT_set * double(r));
 
 % check for NaN, Inf aftwerards and notify user
 if ( isinf(narlf) || isnan(narlf) )
