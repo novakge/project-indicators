@@ -64,8 +64,10 @@ end
 
 % calculate TPT for each project for the old (N)ARLF version and for non-zero release dates
 TPT_all = {};
+EST_all = {};
+EFT_all = {};
 for j = 1:num_projects % for each project
-    [TPT_all{j},EST_all{j}] = tptfast(DSM_all{j},TD_all{j});
+    [TPT_all{j},EST_all{j},EFT_all{j}] = tptfast(DSM_all{j},TD_all{j});
     TPT_all{j} = TPT_all{j} + release_dates(j); % consider release date of projects
 end
 
@@ -104,7 +106,7 @@ resource_profile = zeros(num_projects,max(cell2mat(TPT_all))); % pre-allocate a 
 for j=1:num_projects % for each project
     for i=1:num_activities(j) % for all tasks
         for k=1:num_r_resources % for all resources
-            for t=EST_all{j}(i)+1:EST_all{j}(i)+TD_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
+            for t=EST_all{j}(i)+1:EFT_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
                 
                 % NARLF original version
                 
@@ -126,7 +128,7 @@ resource_profile_ = zeros(num_projects,max(cell2mat(TPT_all))); % pre-allocate a
 for j=1:num_projects % for each project
     for i=1:num_activities(j) % for all tasks
         for k=1:num_r_resources % for all resources
-            for t=EST_all{j}(i)+1:EST_all{j}(i)+TD_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
+            for t=EST_all{j}(i)+1:EFT_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
                 
                 if (t <= (min(release_dates) + ceil(max(cell2mat(TPT_all))/2+1))) % t is in first half, consider as negative; +1 for non-zero release dates
                     resource_profile_(j,release_dates(j)+t) = resource_profile_(j,release_dates(j)+t) + RD_all{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
