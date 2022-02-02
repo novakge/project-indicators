@@ -82,7 +82,7 @@ for j=1:num_projects % for each project
         
         for i=1:num_activities(j) % for all tasks
             
-            for t=EST_all{j}(i)+1:EST_all{j}(i)+TD_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
+            for t=EST_all{j}(i)+1:EFT_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
                 
                 % ARLF original version
                 
@@ -112,7 +112,7 @@ for j=1:num_projects % for each project
                 
                 if (t <= (release_dates(j) + ceil(TPT_all{j}/2) + 1)) % t is in first half, consider as negative; +1 for non-zero release dates
                     % remark: rounding up TPT/2 is not defined in the original equation (Browning et al., 2010), but used here to align with existing results in literature (Van Eynde, 2020). 
-                    resource_profile(j,t) = resource_profile(j,t) + RD_all{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
+                    resource_profile(j,t) = resource_profile(j,t) - RD_all{j}(i,k); % subtract resource demand(s) of task_i;
                 else % t is in second half, consider as positive
                     resource_profile(j,t) = resource_profile(j,t) + RD_all{j}(i,k); % add resource demand(s) of task_i;
                 end
@@ -130,8 +130,8 @@ for j=1:num_projects % for each project
         for k=1:num_r_resources % for all resources
             for t=EST_all{j}(i)+1:EFT_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
                 
-                if (t <= (min(release_dates) + ceil(max(cell2mat(TPT_all))/2 + 1))) % t is in first half, consider as negative; +1 for non-zero release dates
-                    resource_profile_(j,t) = resource_profile_(j,t) + RD_all{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
+                if (t <= (min(release_dates) + ceil(max(cell2mat(TPT_all))/2) + 1)) % t is in first half, consider as negative; +1 for non-zero release dates
+                    resource_profile_(j,t) = resource_profile_(j,t) - RD_all{j}(i,k); % subtract resource demand(s) of task_i;
                 else % t is in second half, consider as positive
                     resource_profile_(j,t) = resource_profile_(j,t) + RD_all{j}(i,k); % add resource demand(s) of task_i;
                 end
