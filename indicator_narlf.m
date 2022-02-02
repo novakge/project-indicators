@@ -106,15 +106,17 @@ resource_profile = zeros(num_projects,max(cell2mat(TPT_all))); % pre-allocate a 
 for j=1:num_projects % for each project
     for i=1:num_activities(j) % for all tasks
         for k=1:num_r_resources % for all resources
-            for t=EST_all{j}(i)+1:EFT_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
-                
-                % NARLF original version
-                
-                if (t <= (release_dates(j) + ceil(TPT_all{j}/2) + 1)) % t is in first half, consider as negative; +1 for non-zero release dates
-                    % remark: rounding up TPT/2 is not defined in the original equation (Browning et al., 2010), but used here to align with existing results in literature (Van Eynde, 2020). 
-                    resource_profile(j,t) = resource_profile(j,t) - RD_all{j}(i,k); % subtract resource demand(s) of task_i;
-                else % t is in second half, consider as positive
-                    resource_profile(j,t) = resource_profile(j,t) + RD_all{j}(i,k); % add resource demand(s) of task_i;
+            for t=EST_all{j}(i):EFT_all{j}(i)
+                if ((t>=EST_all{j}(i))&&(t<EFT_all{j}(i))) % the task is active at this time
+                    
+                    % NARLF original version
+                    
+                    if (t <= (release_dates(j) + ceil(TPT_all{j}/2))) % t is in first half, consider as negative; +1 for non-zero release dates
+                        % remark: rounding up TPT/2 is not defined in the original equation (Browning et al., 2010), but used here to align with existing results in literature (Van Eynde, 2020).
+                        resource_profile(j,t+1) = resource_profile(j,t+1) - RD_all{j}(i,k); % subtract resource demand(s) of task_i; non-zero indexing
+                    else % t is in second half, consider as positive
+                        resource_profile(j,t+1) = resource_profile(j,t+1) + RD_all{j}(i,k); % add resource demand(s) of task_i;
+                    end
                 end
             end
         end
@@ -124,16 +126,17 @@ end
 
 % NARLF' improved version (here as NARLF_)
 % build complete resource profile as checking EST is not accurate enough
-resource_profile_ = zeros(num_projects,max(cell2mat(TPT_all))); % pre-allocate a row vector for resource profile(s), for all tasks
+resource_profile_ = zeros(num_projects,max(cell2mat(TPT_all))+1); % pre-allocate a row vector for resource profile(s), for all tasks
 for j=1:num_projects % for each project
     for i=1:num_activities(j) % for all tasks
         for k=1:num_r_resources % for all resources
-            for t=EST_all{j}(i)+1:EFT_all{j}(i) % non-zero indexing e.g. if EST=0; TD=0 is skipped
-                
-                if (t <= (min(release_dates) + ceil(max(cell2mat(TPT_all))/2) + 1)) % t is in first half, consider as negative; +1 for non-zero release dates
-                    resource_profile_(j,t) = resource_profile_(j,t) - RD_all{j}(i,k); % subtract resource demand(s) of task_i;
-                else % t is in second half, consider as positive
-                    resource_profile_(j,t) = resource_profile_(j,t) + RD_all{j}(i,k); % add resource demand(s) of task_i;
+            for t=EST_all{j}(i):EFT_all{j}(i)
+                if ((t>=EST_all{j}(i))&&(t<EFT_all{j}(i))) % the task is active at this time
+                    if (t <= (min(release_dates) + ceil(max(cell2mat(TPT_all))/2))) % t is in first half, consider as negative;
+                        resource_profile_(j,t+1) = resource_profile_(j,t+1) - RD_all{j}(i,k); % subtract resource demand(s) of task_i; non-zero index
+                    else % t is in second half, consider as positive
+                        resource_profile_(j,t+1) = resource_profile_(j,t+1) + RD_all{j}(i,k); % add resource demand(s) of task_i;
+                    end
                 end
             end
         end
