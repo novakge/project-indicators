@@ -89,7 +89,7 @@ for j=1:num_projects % for each project
                 if (t <= (release_dates(j) + TPT_all{j}/2)) % t is in first half, consider as negative
                     % remark: +1 for non-zero release dates not used here
                     % remark: rounding up TPT_j/2 is not used here as in Van Eynde (2020)
-                    res_profile(t) = res_profile(t) + RD_all{j}(i,k) * (-1); % subtract resource demand(s) of task_i;
+                    res_profile(t) = res_profile(t) - RD_all{j}(i,k); % subtract resource demand(s) of task_i;
                 else % t is in second half, consider as positive
                     res_profile(t) = res_profile(t) + RD_all{j}(i,k); % add resource demand(s) of task_i;
                 end
