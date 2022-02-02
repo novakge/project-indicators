@@ -111,7 +111,7 @@ end
 
 function test_ARLF_001(testCase) % NTP
 [ARLF_act,~,~] = indicator_narlf(testCase.TestData.ARLF_001_1,testCase.TestData.ARLF_001_2,testCase.TestData.ARLF_001_3);
-ARLF_exp = -3.262;
+ARLF_exp = -4.404;
 verifyEqual(testCase,ARLF_act,ARLF_exp,'AbsTol',0.001)
 end
 
