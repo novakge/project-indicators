@@ -16,6 +16,7 @@
 % | TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT		|    X   |   X   | // test if the same, then global
 % | alpha_RS									|        |   X   | // only local
 % | fr,sr										|    X   |   X   | // global=local (for sure)
+% | ap, comps, degrees                          |    X   |   X   | // global!=local
 % +---------------------------------------------+--------+-------+
 
 % original order from previous results XLS
@@ -46,7 +47,7 @@ fprintf(data,'type;filename;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;
 % extended indicators list
 fprintf(data,'num_projects;sum(num_activities);a_RS;alpha_i1;alpha_i2;arlf;narlf;narlf_;c_total;cnc_total;DMND_total;gini;gini_total;i1;i1_total;i2;i2_total;i3;i3_total;i4;i4_total;i5;i5_total;i6;i6_total;MAXCPL_total;NFREESLK_total;NSLACK_total;OFACT_total;os_total;PCTFREESLK_total;mean(PCTR_total);PCTR_total;PCTSLACK_total;mean(RC_total);RC_total;RF_total;mean(RS_total);RS_total;mean(RU_total);RU_total;TCON_total;tdensity_total;TOTOFACT_total;TOTSLACK_R_total;TOTUFACT_total;UFACT_total;UTIL_total;VADUR_total;XCON_total;xdensity_total;XDMND_total;XDUR_total;XFREESLK_total;XPCTR_total;XRC_total;XRS_total;XRU_total;XSLACK_R_total;XSLACK_total;XUTIL_total;');
 % extended list with mean values
-fprintf(data,'mean(c);mean(cnc);mean(XDUR);mean(VADUR);mean(os);mean(NSLACK);mean(PCTSLACK);mean(XSLACK);mean(XSLACK_R);mean(TOTSLACK_R);mean(MAXCPL);mean(NFREESLK);mean(XFREESLK);mean(tdensity);mean(xdensity);mean(RF);mean(XDMND);mean(XUTIL);mean(XCON);mean(TOTOFACT);mean(OFACT);mean(UFACT);mean(TOTUFACT);mean(DMND_total);mean(gini);mean(i2);mean(i3);mean(i4);mean(i5);mean(i6);mean(OFACT_total);mean(UFACT_total);\n'); % stop with newline
+fprintf(data,'mean(c);mean(cnc);mean(XDUR);mean(VADUR);mean(os);mean(NSLACK);mean(PCTSLACK);mean(XSLACK);mean(XSLACK_R);mean(TOTSLACK_R);mean(MAXCPL);mean(NFREESLK);mean(XFREESLK);mean(tdensity);mean(xdensity);mean(RF);mean(XDMND);mean(XUTIL);mean(XCON);mean(TOTOFACT);mean(OFACT);mean(UFACT);mean(TOTUFACT);mean(DMND_total);mean(gini);mean(i2);mean(i3);mean(i4);mean(i5);mean(i6);mean(OFACT_total);mean(UFACT_total);mean(ap);ap_total;mean(comps);comps_total;mean(degrees_total)\n'); % stop with newline
 
 
 for d=1:size(dirlist,1) % go through all directories
@@ -55,16 +56,17 @@ for d=1:size(dirlist,1) % go through all directories
     
     
     % FIXME: PRELIMINARY RUN WITH randomly selected instance samples from each dataset (directory), for the final run, this must be removed!
-    % filelist = filelist(randsample(size(filelist,1),10));
+    filelist = filelist(randsample(size(filelist,1),20));
     
     % load all files in the defined folder and calculate all indicators
     for i=1:size(filelist)
         
         % load variables from next file
-        load(fullfile(filelist(i).folder,filelist(i).name),'PDM','constr','num_r_resources','num_modes','num_activities','sim_type');
-        
+        load(fullfile(filelist(i).folder,filelist(i).name),'PDM','constr','num_r_resources','num_modes','num_activities','sim_type','release_dates');
+              
         % check (multi)project size based on number of activities vector
         num_projects = numel(num_activities); % can change later on with flexibility
+        
         n = sum(num_activities); % n is the total number of each projects activities, can change later on with flexibility
         r = num_r_resources; % number of renewable resources
         w = num_modes; % number of execution modes
@@ -112,6 +114,7 @@ for d=1:size(dirlist,1) % go through all directories
             % re-calculate total number of activities without supplementary tasks and flexible dependencies after all removed
             n_flex = sum(num_activities_flex); % total number of activities now without flexible tasks and dependencies equivalent to sum(num_activities)
             num_projects_flex = nnz(num_activities_flex); % consider removed projects also
+            release_dates_flex = zeros(1,num_projects_flex); % update optional release dates with flexible number of projects
             
             % re-calculate start-end offset of each project based on number of activities
             prj_starts_flex = cumsum([1,num_activities_flex(1:end-1)]); % starting with 1 for the first project, ignoring last entry
@@ -150,6 +153,13 @@ for d=1:size(dirlist,1) % go through all directories
             os=0;
             xdensity=0;
             tdensity=0;
+            g=0;
+            ap=0;
+            comps=0;
+            cut=0;
+            bins=0;
+            degrees=0;
+            
             for j=1:num_projects_flex
                 [i1(j),i2(j),i3(j),i4(j),i5(j),i6(j)] = indicators(DSM{j});
                 c(j) = indicator_c(DSM{j});
@@ -158,11 +168,18 @@ for d=1:size(dirlist,1) % go through all directories
                 
                 xdensity(j) = indicator_xdensity(DSM{j});
                 tdensity(j) = indicator_tdensity(DSM{j});
+                
+                g = graph(DSM{j},'upper','omitSelfLoops');
+                [~,cut] = biconncomp(g);
+                bins = conncomp(g);
+                ap(j) = numel(cut); % numer of articulation points
+                comps(j) = max(bins); % number of connected components
+                degrees(j) = mean(degree(g));
             end
             % get alpha distances (variaton)
             alpha_i1 = alphadist(i1); % number of activities already considers flexible tasks
             alpha_i2 = alphadist(i2); % serial-parallel indicator already considers flexible tasks
-            
+                        
             
             %% global DSM based indicators (logical structure) calculated for combined project
             [i1_total,i2_total,i3_total,i4_total,i5_total,i6_total] = indicators(DSM_global);
@@ -173,6 +190,12 @@ for d=1:size(dirlist,1) % go through all directories
             xdensity_total = indicator_xdensity(DSM_global);
             tdensity_total = indicator_tdensity(DSM_global);
             
+            g = graph(DSM_global, 'upper', 'omitSelfLoops'); % or remove ones from diagonal
+            [~,cut] = biconncomp(g);
+            bins = conncomp(g);
+            comps_total = max(bins); % get number of connected components of graph
+            ap_total = numel(cut); % numer of global articulation points
+            degrees_total = mean(degree(g));
             
             %% local PDM based indicators calculated for individual projects
             
@@ -226,7 +249,7 @@ for d=1:size(dirlist,1) % go through all directories
             
             % global calculations
             % resource related
-            [arlf,narlf,narlf_] = indicator_narlf(PSM_all, num_activities_flex, num_r_resources);
+            [arlf,narlf,narlf_] = indicator_narlf(PSM_all, num_activities_flex, num_r_resources, release_dates_flex);
             % TODO test if global vs local differs, if not, keep global and note in overview ascii table
             [RF_total,RU_total,PCTR_total,DMND_total,XDMND_total,RS_total,RC_total,UTIL_total,XUTIL_total,TCON_total,XCON_total,OFACT_total,TOTOFACT_total,UFACT_total,TOTUFACT_total] = indicators_resource(PSM_all,num_r_resources,constr); % TPT_max information is not needed as the DSM superset is given
             % calculate a_RS from individual values here before averaging
@@ -288,7 +311,7 @@ for d=1:size(dirlist,1) % go through all directories
             fprintf(data,'%s;%s;', num2str(mean(RF)), num2str(mean(XDMND)));
             fprintf(data,'%s;%s;%s;%s;%s;%s;', num2str(mean(XUTIL)), num2str(mean(XCON)), num2str(mean(TOTOFACT)), num2str(mean(cell2mat(OFACT))), num2str(mean(cell2mat(UFACT))), num2str(mean(TOTUFACT)));
             fprintf(data,'%s;%s;%s;%s;%s;%s;%s;', num2str(mean(DMND_total)), num2str(mean(gini)), num2str(mean(i2)),num2str(mean(i3)),num2str(mean(i4)),num2str(mean(i5)),num2str(mean(i6)));
-            fprintf(data,'%s;%s;', num2str(mean(OFACT_total)), num2str(mean(UFACT_total)));
+            fprintf(data,'%s;%s;%s;%s;%s;%s;%s', num2str(mean(OFACT_total)), num2str(mean(UFACT_total)),num2str(mean(ap)),num2str(ap_total),num2str(mean(comps)),num2str(comps_total),num2str(degrees_total));
 
             % close
             fprintf(data,'\n'); % end with a newline
@@ -332,6 +355,7 @@ status = fclose(data); % close result file and get the status of the operation
         % add NARLF, alphas etc. in a logical way, create new order
         % idea of combining real-world projects into multiproject or company example comparison
         % add different types of task removal (keeping precedence relations)
-        % add support for MPSPLIB, MISTA
+        % add support for MISTA
         % find out why and how to handle NaN and Inf values
         % backtest previous single project results
+        % handle release dates in time and resource (schedule) related indicators (EST+release date->maintain e.g. TPT)
