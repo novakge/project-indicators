@@ -4,9 +4,10 @@
 % dsmid=the k-th combination of matrix, n=number of tasks, p=number of projects, r=number of resources, tvalues=values for time, rvalues=values for resources 
 % example #1: to get the possible iterations ranges for the planned size:
 % >> [~,dsm_possible,t_possible,r_possible] = genpdm(1,1,1,3,3,1,[0,1],[1,2])
-% output #1: [262144,512,512]
-% example #2 to get k-th combination with desired sizes
+% output  #1: [262143,512,512] // PDM generated with these parameters will be the last combination
+% example #2: to get k-th combination with desired sizes
 % >> [PDM] = genpdm(262143,512,512,3,3,1,[0,1],[1,2])
+% output  #2: PDM with the desired k-th combination instance
 
 function [PDM,dsm_possible,t_possible,r_possible] = genpdm(dsmid,tid,rid,n,p,r,tvalues,rvalues)
 
@@ -33,14 +34,14 @@ r_possible = r_elem^r_places;
 
 
 % plausibility checks before creating the matrix
-if dsmid > dsm_possible
-    error('DSM combination %d > %d is out of range!\n',dsmid, dsm_possible);
+if dsmid > dsm_possible || dsmid <= 0
+    error('DSM combination %d is out of range [1,%d]!\n',dsmid, dsm_possible);
 end
-if tid > t_possible
-    error('Time combination %d > %d is out of range!\n',tid, t_possible);
+if tid > t_possible || tid <= 0
+    error('Time combination %d is out of range [1,%d]!\n',tid, t_possible);
 end
-if rid > r_possible
-    error('Resource combination %d > %d is out of range!\n',rid, r_possible);
+if rid > r_possible || rid <= 0
+    error('Resource combination %d is out of range [1,%d]!\n',rid, r_possible);
 end
 
 % create DSM combination
@@ -90,8 +91,7 @@ for k=1:rid
         end
     end
 end
-% then split into r columns
-RD = reshape(RD,[],r);
+RD = reshape(RD,[],r); % then split into r columns
 
 % post-processing: remove zero tasks and related values
 TD = TD(diag(DSM)==1,:); % remove time demands for zero tasks
@@ -101,5 +101,5 @@ DSM = DSM(diag(DSM)==1,diag(DSM)==1); % finally, remove zero tasks
 % return merged PDM
 PDM = [DSM TD RD]; % hint: sparse matrix actually takes more storage & computation time
 
-    
+
 end % function
