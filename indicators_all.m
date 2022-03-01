@@ -56,7 +56,7 @@ for d=1:size(dirlist,1) % go through all directories
     
     
     % FIXME: PRELIMINARY RUN WITH randomly selected instance samples from each dataset (directory), for the final run, this must be removed!
-    filelist = filelist(randsample(size(filelist,1),20));
+    % filelist = filelist(randsample(size(filelist,1),20));
     
     % load all files in the defined folder and calculate all indicators
     for i=1:size(filelist)
@@ -336,7 +336,11 @@ for d=1:size(dirlist,1) % go through all directories
             fprintf(data,'\n'); % end with a newline
             
         end % loop flexibility factors
+        if mod(i,100)==0 % write percentage every 20th item
+            fprintf('%f%%\n',i/size(filelist,1)*100); % end with a newline
+        end
     end % loop files
+    fprintf('Processing directory: %d of %d\n', d, size(dirlist,1)); % end with a newline
 end % loop folders
 
 status = fclose(data); % close result file and get the status of the operation
