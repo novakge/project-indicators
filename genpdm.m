@@ -3,13 +3,13 @@
 % memory efficient as each instance is generated on the fly, no array used for storing all combinations (problem with high number of instances)
 % dsmid=the k-th combination of matrix, n=number of tasks, p=number of projects, r=number of resources, tvalues=values for time, rvalues=values for resources 
 % example #1: to get the possible iterations ranges for the planned size:
-% >> [~,dsm_possible,t_possible,r_possible] = genpdm(1,1,1,3,3,1,[0,1],[1,2])
+% >> [~,~,dsm_possible,t_possible,r_possible] = genpdm(1,1,1,3,3,1,[0,1],[1,2])
 % output  #1: [262143,512,512] // PDM generated with these parameters will be the last combination
 % example #2: to get k-th combination with desired sizes
-% >> [PDM] = genpdm(262143,512,512,3,3,1,[0,1],[1,2])
-% output  #2: PDM with the desired k-th combination instance
+% >> [PDM,num_activities] = genpdm(262143,512,512,3,3,1,[0,1],[1,2])
+% output  #2: PDM with the desired k-th combination instance, number of activities array
 
-function [PDM,dsm_possible,t_possible,r_possible] = genpdm(dsmid,tid,rid,n,p,r,tvalues,rvalues)
+function [PDM,num_activities,dsm_possible,t_possible,r_possible] = genpdm(dsmid,tid,rid,n,p,r,tvalues,rvalues)
 
 % parameters for generation
 n = n; % number of tasks (input parameter)
@@ -17,6 +17,13 @@ p = p; % number of projects (input parameter)
 r = r; % number of renewable resources
 r_values = rvalues; % possible resource demand values to assign
 t_values = tvalues; % possible time demand values to assign
+
+num_activities = 0;
+for pp=1:p
+    num_activities(pp) = n;
+end
+prj_starts = cumsum([1,num_activities(1:end-1)]); % starting with 1 for the first project, ignoring last entry
+prj_ends = cumsum(num_activities(1:end));
 
 % calculate values needed for function call
 num_bits_dsm = p*(n*(n+1)/2); % number of bits considered, only upper triangle including diagonal (=task+relations)
@@ -94,12 +101,20 @@ end
 RD = reshape(RD,[],r); % then split into r columns
 
 % post-processing: remove zero tasks and related values
+% store number of activities before removing zero tasks
+for pp=1:p
+    num_activities(pp) = nnz(diag(DSM(prj_starts(pp):prj_ends(pp),prj_starts(pp):prj_ends(pp))));
+end
+num_activities = nonzeros(num_activities)'; % update number of activities after removing zero tasks
+
+% remove zero tasks and related data
 TD = TD(diag(DSM)==1,:); % remove time demands for zero tasks
 RD = RD(diag(DSM)==1,:); % remove resource demands for zero tasks
 DSM = DSM(diag(DSM)==1,diag(DSM)==1); % finally, remove zero tasks
+CD = zeros(size(DSM,1),1);
 
 % return merged PDM
-PDM = [DSM TD RD]; % hint: sparse matrix actually takes more storage & computation time
+PDM = [DSM TD CD RD]; % hint: sparse matrix actually takes more storage & computation time
 
 
 end % function
