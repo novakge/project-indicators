@@ -17,7 +17,7 @@ else
         m=zeros(size(dsm,1),1);
         stage=1;
         while min(m)==0
-            r=max(dsm)==0;
+            r=sum(dsm)==0;
             m(r&(m==0)')=stage;
             dsm(r,:)=0;
             stage=stage+1;
@@ -40,7 +40,7 @@ else
         dsm=dsm-eye(size(dsm,1));
         m=zeros(size(dsm,1),1);
         while stage>=1
-            r=max(dsm)==0;
+            r=sum(dsm)==0;
             m(r&(m==0)')=stage;
             dsm(r,:)=0;
             stage=stage-1;
