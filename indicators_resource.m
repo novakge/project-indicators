@@ -51,9 +51,18 @@
 
 
 function [RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL,TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT]=indicators_resource(PSM,num_r_resources,constr,TPT_max)
+
 n=size(PSM,1);
 %w=1; % number of modes (w) is 1 (one) after the PDM has been decided, the PSM has been defined
-r=num_r_resources; % number of renewable resources 
+
+% handle zero resource case
+if (num_r_resources == 0)
+    [RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL,TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT] = deal(NaN);
+    return;
+else
+    r=num_r_resources; % number of renewable resources
+end
+
 LD=PSM(:,1:n);
 RD=PSM(:,n+2+1:n+2+r); %resource domain, n-by-r matrix
 TD=PSM(:,n+1); %n-by-1 vector
