@@ -35,7 +35,7 @@ dir_done = 'data_done'; % copy processed data instances to be able to continue w
 dir_out = 'out'; % save all generated flexible mat files
 [~,~] = mkdir(dir_out); % create dir, ignore if existing
 
-dirlist = dir(fullfile(dir_in, '**\*.*')); % get list of files and folders in any subfolder
+dirlist = dir(fullfile(dir_in, '/**/*')); % get list of files and folders in any subfolder
 dirlist = dirlist([dirlist.isdir]); % keep only folders in list
 tf = ismember( {dirlist.name}, {'.', '..'});
 dirlist(tf) = []; % remove current and parent directory
