@@ -13,6 +13,8 @@ Generate flexible project structures.
 2. Prerequisites
  
  Mathworks MATLAB R2017a
+ 
+ Matrix-based instances produced by [project-parser](https://github.com/novakge/project-parsers) tool
 
 3. Installation instructions 
  
@@ -37,7 +39,7 @@ Generate flexible project structures.
    
    Calculate indicators for a given data instance
     
-    input: existing folder containing matrix-based project instances produced by [project-parser](https://github.com/novakge/project-parsers) tool, e.g. j301_10 NTP.mat
+    input: existing folder containing matrix-based project instances produced by "project-parsers" tool, e.g. j301_10 NTP.mat
     
     example: >> load(’test data/j301_10_NTP.mat’, ’PDM’, ’num modes’) % load variables from a MAT container
     
@@ -49,7 +51,8 @@ Generate flexible project structures.
     
    It is also possible to batch process all datasets, generate all flexible structures and calculcate their indicators.
     
-    input: existing data folder containing the already parsed matrix-based .mat files by [project-parser](https://github.com/novakge/project-parsers) tool
+    input: existing data folder containing the already parsed matrix-based .mat files by "project-parsers" tool
+    
     example: >> indicators_all
     
     output: The output files are stored in the folder ../results/ including the MAT files of flexible instances with a filename pattern ’<instance-name>_fp<#>_mode<#>.mat’,
