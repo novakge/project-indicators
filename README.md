@@ -28,7 +28,7 @@ Generate flexible project structures.
 ├── doc                   <- Contains additional documentation, information etc.
 ├── src                   <- Code directory for matlab source files
 ├── test_data             <- Directory for test related datasets, mat files etc.
-├── out                   <- Directory for results and output
+├── results               <- Directory for results and output
 ```
 
 4. Features and examples
