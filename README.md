@@ -23,7 +23,7 @@ Generate flexible project structures.
 3.1 Folders
 ```
 ├                         <- Root directory
-├── data                  <- Containing several standard datasets
+├── data                  <- Contains the matrix-based datasets to process
 │   ├── e.g. j30          <- Folder of example dataset containing matrix-formatted instances
 │   ├── e.g. mmlib50      <- ...
 │   ├── ...               <- ...
@@ -31,6 +31,7 @@ Generate flexible project structures.
 ├── src                   <- Code directory for matlab source files
 ├── test_data             <- Directory for test related datasets, mat files etc.
 ├── results               <- Directory for results and output
+│   ├── e.g. j30_out      <- Example output folder containing the generated flexible instances (optional)
 ```
 
 4. Features and examples
