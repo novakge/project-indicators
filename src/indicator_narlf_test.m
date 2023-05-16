@@ -43,7 +43,7 @@ testCase.TestData.ARLF_001_1 = PSM;
 testCase.TestData.ARLF_001_2 = data.num_activities; % activities
 testCase.TestData.ARLF_001_3 = data.num_r_resources; % resources
 
-% project 1 example from literature: Kurtulus, I. (1985). Multiproject scheduling: Analysis of scheduling strategies under unequal delay penalties. Journal of Operations Management, 5(3), 291–307. doi:10.1016/0272-6963(85)90015-4 
+% project 1 example from literature: Kurtulus, I. (1985). Multiproject scheduling: Analysis of scheduling strategies under unequal delay penalties. Journal of Operations Management, 5(3), 291â€“307. doi:10.1016/0272-6963(85)90015-4 
 % CD is n/a (=NaN)
 testCase.TestData.ARLF_002_1 = [1,1,1,1,1,0,0,NaN,0;
                                 0,1,0,0,0,1,2,NaN,1;
@@ -56,7 +56,7 @@ testCase.TestData.ARLF_002_2 = 6; % 6 activities
 testCase.TestData.ARLF_002_3 = 1; % 1 renewable resource
 
 
-% project 2 example from literature: Kurtulus, I. (1985). Multiproject scheduling: Analysis of scheduling strategies under unequal delay penalties. Journal of Operations Management, 5(3), 291–307. doi:10.1016/0272-6963(85)90015-4 
+% project 2 example from literature: Kurtulus, I. (1985). Multiproject scheduling: Analysis of scheduling strategies under unequal delay penalties. Journal of Operations Management, 5(3), 291â€“307. doi:10.1016/0272-6963(85)90015-4 
 % CD is n/a (=NaN)
 testCase.TestData.ARLF_003_1 = [1,1,0,0,0,0,0,NaN,0;
                                 0,1,1,1,1,0,3,NaN,1;
