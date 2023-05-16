@@ -1,4 +1,4 @@
-%Author: Zsolt T. Koszty·n Ph.D habil., University of Pannonia,
+%Author: Zsolt T. Koszty√°n Ph.D habil., University of Pannonia,
 %Faculty of Economics, Department of Quantitative Methods
 %----------------
 %Evaluate the project duration, when the Scheduled Start Time (SST) is 
