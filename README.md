@@ -40,11 +40,11 @@ Generate flexible project structures.
    
    Calculate indicators for a given data instance
     
-    input: existing folder containing matrix-based project instances produced by "project-parsers" tool, e.g. j301_10 NTP.mat
+    input: existing folder containing matrix-based project instances produced by "project-parsers" tool, e.g. j301_10_NTP.mat
     
-    example: >> load(’test data/j301_10_NTP.mat’, ’PDM’, ’num modes’) % load variables from a MAT container
+    example: >> load('test_data/j301_10_NTP.mat', 'PDM', 'num_modes') % load variables from a MAT container
     
-    example: >> [NSLACK, PCTSLACK,~,~] = indicator slack(PDM, num modes) % calculate some of the time-related indicators
+    example: >> [NSLACK, PCTSLACK, ~, ~] = indicator_slack(PDM, num_modes) % calculate some of the time-related indicators, ignore with "~"
     
     output: [NSLACK, PCTSLACK] variables (array) contain the calculated indicator values, e.g., NSLACK = 22, PCTSLACK = 0.73
 
