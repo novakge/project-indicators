@@ -13,7 +13,7 @@ end
 % setup test cases
 function setup(testCase)
 
-% Example from Bashir, H. A. (2010). Removal of Redundant Relationships in an AON Project Network for Evaluating Schedule Complexity. Journal of Construction Engineering and Management, 136(7), 787–793. doi:10.1061/(asce)co.1943-7862.0000181 
+% Example from Bashir, H. A. (2010). Removal of Redundant Relationships in an AON Project Network for Evaluating Schedule Complexity. Journal of Construction Engineering and Management, 136(7), 787â€“793. doi:10.1061/(asce)co.1943-7862.0000181Â 
 data = [1 1 1 0 0,
         0 1 0 1	0,
         0 0 1 1	0,
