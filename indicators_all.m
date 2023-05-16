@@ -27,21 +27,19 @@ clear % clear all obsolete variables
 
 % constants
 extension_filter = '*.mat'; % select extension
-dir_in = 'data'; % directory containing dataset
+dir_src = '../src/'; % where the code is stored
+dir_in = '../data/'; % directory containing dataset
+dir_done = '../results/'; % where to move processed data instances to be able to continue where left off
+dir_gen = '../results/'; % where to save all generated flexible mat files
 
-dir_done = 'data_done'; % copy processed data instances to be able to continue where left off
-[~,~] = mkdir(dir_done); % create dir, ignore if existing
-
-dir_out = 'out'; % save all generated flexible mat files
-[~,~] = mkdir(dir_out); % create dir, ignore if existing
-
-dirlist = dir(fullfile(dir_in, '/**/*')); % get list of files and folders in any subfolder
-dirlist = dirlist([dirlist.isdir]); % keep only folders in list
-tf = ismember( {dirlist.name}, {'.', '..'});
+dirlist = dir(fullfile(dir_in, '**')); % get list of files and folders in any subfolder
+dirlist = dirlist([dirlist.isdir]); % keep only folders and subfolders in list
+tf = ismember( {dirlist.name}, {'.', '..'}); % remove "." and ".." entries
 dirlist(tf) = []; % remove current and parent directory
 
 currdate = datestr(now,'yyyymmdd-HHMMSS');
-results = strcat('results-',currdate,'.csv');
+[~,~] = mkdir(dir_gen); % always create dir, ignore if existing
+results = strcat(dir_gen,'results-',currdate,'.csv');
 data = fopen(results,'w');
 
 % parameters
@@ -57,9 +55,11 @@ fprintf(data,'mean(c);mean(cnc);mean(XDUR);mean(VADUR);mean(os);mean(NSLACK);mea
 
 
 for d=1:size(dirlist,1) % go through all directories
-    browse_dir = fullfile(dir_in,dirlist(d).name, extension_filter); % look for all files with the extension in current subfolder
+    browse_dir = fullfile(dirlist(d).folder,dirlist(d).name,extension_filter); % look for all files with the extension in current subfolder
     filelist = dir(browse_dir);
     
+    % store actual database folder name for output folder
+    folder_mirror = strsplit(browse_dir,filesep); % get name of database
     
     % TEST ONLY: PRELIMINARY RUN WITH randomly selected instance samples from each dataset (directory), for the final run, this must be removed!
     % filelist = filelist(randsample(size(filelist,1),20));
@@ -346,16 +346,17 @@ for d=1:size(dirlist,1) % go through all directories
                 % save each generated instance
                 ffact = ff(k); % copy to single variable for matlab save
                 [~,fname]=fileparts(filelist(i).name); % get filename without extension to construct meaningful a filename
-                save(strcat(dir_out,'/',fname,'_ff',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM_global','constr','num_r_resources','num_modes','num_activities_flex','num_projects_flex','sim_type','release_dates','ffact');
+                [~,~] = mkdir(dir_gen,strcat(string(folder_mirror(end-1)),'_gen')); % create dir for generated instances, ignore if existing or empty
+                save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_ff',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM_global','constr','num_r_resources','num_modes','num_activities_flex','num_projects_flex','sim_type','release_dates','ffact');
                 
             end % loop modes
             
         end % loop flexibility factors
         
-        % move actual instance to data_done folder to be able to continue if run is aborted for any reason
-        folder_mirror = strsplit(browse_dir,filesep); % get database
-        [~,~] = mkdir(dir_done,string(folder_mirror(end-1))); % create dir, ignore if existing
-        movefile(fullfile(filelist(i).folder,filelist(i).name),strcat(dir_done,'/',string(folder_mirror(end-1))));        
+        % move actual instance to "done" folder to be able to continue if run is aborted for any reason
+        [~,~] = mkdir(dir_done,strcat(string(folder_mirror(end-1)))); % create dir, ignore if existing or empty
+        movefile(fullfile(filelist(i).folder,filelist(i).name),strcat(dir_done,string(folder_mirror(end-1))));
+
         if mod(i,100)==0 % write percentage every 20th item
             fprintf('%f%%\n',i/size(filelist,1)*100); % end with a newline
         end
