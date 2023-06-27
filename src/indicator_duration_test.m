@@ -14,22 +14,22 @@ end
 function setup(testCase)
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_NTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_NTP.mat', 'PDM', 'num_modes');
 testCase.TestData.XDUR_001_1 = data.PDM;
 testCase.TestData.XDUR_001_2 = data.num_modes; % 1 for NTP
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_CTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_CTP.mat', 'PDM', 'num_modes');
 testCase.TestData.XDUR_002_1 = data.PDM;
 testCase.TestData.XDUR_002_2 = data.num_modes; % 2 for CTP
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
 testCase.TestData.XDUR_003_1 = data.PDM;
 testCase.TestData.XDUR_003_2 = data.num_modes; % w for DTP
 
 % test case considering some zero activities
-data = load('test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
 testCase.TestData.XDUR_004_1 = [1 1 1 1 0  1  2  3;
                                 0 0 0 1 1  4  5  6;
                                 0 0 1 1 0  7  8  9;
@@ -38,22 +38,22 @@ testCase.TestData.XDUR_004_1 = [1 1 1 1 0  1  2  3;
 testCase.TestData.XDUR_004_2 = data.num_modes; % w for DTP
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_NTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_NTP.mat', 'PDM', 'num_modes');
 testCase.TestData.VADUR_001_1 = data.PDM;
 testCase.TestData.VADUR_001_2 = data.num_modes; % 1 for NTP
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_CTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_CTP.mat', 'PDM', 'num_modes');
 testCase.TestData.VADUR_002_1 = data.PDM;
 testCase.TestData.VADUR_002_2 = data.num_modes; % 2 for CTP
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
 testCase.TestData.VADUR_003_1 = data.PDM;
 testCase.TestData.VADUR_003_2 = data.num_modes; % w for DTP
 
 % test case considering some zero activities
-data = load('test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
 testCase.TestData.VADUR_004_1 = [1 1 1 1 0  1  2  3;
                                  0 0 0 1 1  4  5  6;
                                  0 0 1 1 0  7  8  9;

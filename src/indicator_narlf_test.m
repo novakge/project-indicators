@@ -14,7 +14,7 @@ end
 function setup(testCase)
 
 % load parsed data from *.mat file
-data = load('test_data/BY_10_1_14_NTP.mat', 'PDM', 'num_activities', 'num_r_resources');
+data = load('../test_data/BY_10_1_14_NTP.mat', 'PDM', 'num_activities', 'num_r_resources');
 PSM = data.PDM;
 testCase.TestData.NARLF_001_1 = PSM;
 testCase.TestData.NARLF_001_2 = data.num_activities;
@@ -24,7 +24,7 @@ testCase.TestData.NARLF_002_2 = testCase.TestData.NARLF_001_2;
 testCase.TestData.NARLF_002_3 = testCase.TestData.NARLF_001_3;
 
 % load parsed data from *.mat file
-data = load('test_data/BY_8_3_73_NTP.mat', 'PDM', 'num_activities', 'num_r_resources');
+data = load('../test_data/BY_8_3_73_NTP.mat', 'PDM', 'num_activities', 'num_r_resources');
 PSM = data.PDM;
 testCase.TestData.NARLF_003_1 = PSM;
 testCase.TestData.NARLF_003_2 = data.num_activities;
@@ -37,7 +37,7 @@ testCase.TestData.NARLF_004_3 = testCase.TestData.NARLF_003_3;
 
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_NTP.mat', 'PDM', 'num_activities', 'num_r_resources');
+data = load('../test_data/j301_10_NTP.mat', 'PDM', 'num_activities', 'num_r_resources');
 PSM = data.PDM;
 testCase.TestData.ARLF_001_1 = PSM;
 testCase.TestData.ARLF_001_2 = data.num_activities; % activities

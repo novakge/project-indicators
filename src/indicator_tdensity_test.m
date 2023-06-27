@@ -13,19 +13,19 @@ end
 % setup test cases
 function setup(testCase)
 
-data = load('test_data/pat1_DSM.mat', 'DSM');
+data = load('../test_data/pat1_DSM.mat', 'DSM');
 testCase.TestData.TDENSITY_001 = data.DSM;
 
-data = load('test_data/pat103_DSM.mat', 'DSM');
+data = load('../test_data/pat103_DSM.mat', 'DSM');
 testCase.TestData.TDENSITY_002 = data.DSM;
 
-data = load('test_data/pat3_DSM.mat', 'DSM');
+data = load('../test_data/pat3_DSM.mat', 'DSM');
 testCase.TestData.TDENSITY_003 = data.DSM;
 
-data = load('test_data/pat9_DSM.mat', 'DSM');
+data = load('../test_data/pat9_DSM.mat', 'DSM');
 testCase.TestData.TDENSITY_004 = data.DSM;
 
-data = load('test_data/pat11_DSM.mat', 'DSM');
+data = load('../test_data/pat11_DSM.mat', 'DSM');
 testCase.TestData.TDENSITY_005 = data.DSM;
 
 end

@@ -14,19 +14,19 @@ end
 function setup(testCase)
 
 % compare some results with literature
-data = load('test_data/pat1_DSM.mat', 'DSM');
+data = load('../test_data/pat1_DSM.mat', 'DSM');
 testCase.TestData.OS_001 = data.DSM;
 
-data = load('test_data/pat103_DSM.mat', 'DSM');
+data = load('../test_data/pat103_DSM.mat', 'DSM');
 testCase.TestData.OS_002 = data.DSM;
 
-data = load('test_data/pat3_DSM.mat', 'DSM');
+data = load('../test_data/pat3_DSM.mat', 'DSM');
 testCase.TestData.OS_003 = data.DSM;
 
-data = load('test_data/pat9_DSM.mat', 'DSM');
+data = load('../test_data/pat9_DSM.mat', 'DSM');
 testCase.TestData.OS_004 = data.DSM;
 
-data = load('test_data/pat11_DSM.mat', 'DSM');
+data = load('../test_data/pat11_DSM.mat', 'DSM');
 testCase.TestData.OS_005 = data.DSM;
 
 % no connections case

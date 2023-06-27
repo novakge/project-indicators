@@ -13,43 +13,43 @@ end
 % setup test cases
 function setup(testCase)
 % compare some results with literature or own examples
-data = load('test_data/j306_9_NTP.mat','PDM');
+data = load('../test_data/j306_9_NTP.mat','PDM');
 data.DSM = data.PDM(:,1:size(data.PDM,1));
 testCase.TestData.IX_001 = data.DSM;
 
-data = load('test_data/j301_10_NTP.mat','PDM');
+data = load('../test_data/j301_10_NTP.mat','PDM');
 data.DSM = data.PDM(:,1:size(data.PDM,1));
 testCase.TestData.IX_002 = data.DSM;
 
-data = load('test_data/j301_10_DTP.mat','PDM');
+data = load('../test_data/j301_10_DTP.mat','PDM');
 data.DSM = data.PDM(:,1:size(data.PDM,1));
 testCase.TestData.IX_003 = data.DSM;
 
-data = load('test_data/BY_8_3_73_NTP.mat','PDM');
+data = load('../test_data/BY_8_3_73_NTP.mat','PDM');
 data.DSM = data.PDM(:,1:size(data.PDM,1));
 testCase.TestData.IX_004 = data.DSM;
 
-data = load('test_data/BY_10_1_14_NTP.mat','PDM');
+data = load('../test_data/BY_10_1_14_NTP.mat','PDM');
 data.DSM = data.PDM(:,1:size(data.PDM,1));
 testCase.TestData.IX_005 = data.DSM;
 
-data = load('test_data/MPLIB1_Set1_100_NTP.mat','PDM');
+data = load('../test_data/MPLIB1_Set1_100_NTP.mat','PDM');
 data.DSM = data.PDM(:,1:size(data.PDM,1));
 testCase.TestData.IX_006 = data.DSM;
 
-data = load('test_data/pat1_DSM.mat','DSM');
+data = load('../test_data/pat1_DSM.mat','DSM');
 testCase.TestData.IX_007 = data.DSM;
 
-data = load('test_data/pat103_DSM.mat','DSM');
+data = load('../test_data/pat103_DSM.mat','DSM');
 testCase.TestData.IX_008 = data.DSM;
 
-data = load('test_data/pat11_DSM.mat','DSM');
+data = load('../test_data/pat11_DSM.mat','DSM');
 testCase.TestData.IX_009 = data.DSM;
 
-data = load('test_data/pat3_DSM.mat','DSM');
+data = load('../test_data/pat3_DSM.mat','DSM');
 testCase.TestData.IX_010 = data.DSM;
 
-data = load('test_data/pat9_DSM.mat','DSM');
+data = load('../test_data/pat9_DSM.mat','DSM');
 testCase.TestData.IX_011 = data.DSM;
 
 end

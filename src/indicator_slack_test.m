@@ -14,22 +14,22 @@ end
 function setup(testCase)
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_NTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_NTP.mat', 'PDM', 'num_modes');
 testCase.TestData.SLACK_001_1 = data.PDM;
 testCase.TestData.SLACK_001_2 = data.num_modes; % 1 for NTP
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_CTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_CTP.mat', 'PDM', 'num_modes');
 testCase.TestData.SLACK_002_1 = data.PDM;
 testCase.TestData.SLACK_002_2 = data.num_modes; % 2 for CTP
 
 % load parsed data from *.mat file
-data = load('test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
 testCase.TestData.SLACK_003_1 = data.PDM;
 testCase.TestData.SLACK_003_2 = data.num_modes; % w for DTP
 
 % test case considering some zero activities
-data = load('test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
+data = load('../test_data/j301_10_DTP.mat', 'PDM', 'num_modes');
 testCase.TestData.SLACK_004_1 = [1 1 1 1 0  1  2  3;
                                  0 0 0 1 1  4  5  6;
                                  0 0 1 1 0  7  8  9;

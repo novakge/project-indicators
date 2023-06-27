@@ -13,15 +13,15 @@ end
 % setup test cases
 function setup(testCase)
 
-data = load('test_data/MPLIB1_Set1_100_NTP.mat', 'PDM', 'num_r_resources');
+data = load('../test_data/MPLIB1_Set1_100_NTP.mat', 'PDM', 'num_r_resources');
 testCase.TestData.GINI_001 = data.PDM;
 testCase.TestData.GINI_002 = data.num_r_resources;
 
-data = load('test_data/BY_8_3_73_NTP.mat', 'PDM', 'num_r_resources');
+data = load('../test_data/BY_8_3_73_NTP.mat', 'PDM', 'num_r_resources');
 testCase.TestData.GINI_003 = data.PDM;
 testCase.TestData.GINI_004 = data.num_r_resources;
 
-data = load('test_data/j301_10_NTP.mat', 'PDM', 'num_r_resources');
+data = load('../test_data/j301_10_NTP.mat', 'PDM', 'num_r_resources');
 testCase.TestData.GINI_005 = data.PDM;
 testCase.TestData.GINI_006 = data.num_r_resources;
 end

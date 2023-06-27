@@ -34,13 +34,13 @@ data = [1 1 1 0 0 0 0 0,
 testCase.TestData.C_002 = data;
 
 
-data = load('test_data/pat3_DSM.mat', 'DSM');
+data = load('../test_data/pat3_DSM.mat', 'DSM');
 testCase.TestData.C_003 = data.DSM;
 
-data = load('test_data/pat9_DSM.mat', 'DSM');
+data = load('../test_data/pat9_DSM.mat', 'DSM');
 testCase.TestData.C_004 = data.DSM;
 
-data = load('test_data/pat11_DSM.mat', 'DSM');
+data = load('../test_data/pat11_DSM.mat', 'DSM');
 testCase.TestData.C_005 = data.DSM;
 
 % 2nd Example from Khan, M., & Siddiqui, M. (2010). Quantitative quality assessment of network-based schedules. In Proceeding of the international Conference on Computing in Civil and Building Engineering.

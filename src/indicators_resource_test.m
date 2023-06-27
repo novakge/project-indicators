@@ -13,7 +13,7 @@ end
 % setup test cases
 function setup(testCase)
 % compare some results with literature or own examples
-data = load('test_data/j306_9_NTP.mat','PDM','num_r_resources','constr');
+data = load('../test_data/j306_9_NTP.mat','PDM','num_r_resources','constr');
 testCase.TestData.RES_001 = data.PDM;
 testCase.TestData.RES_002 = data.num_r_resources;
 testCase.TestData.RES_003 = data.constr;
