@@ -40,7 +40,7 @@ dsm(diag(DSM)==0,:)=0;
 dsm(:,diag(DSM)==0)=0;
 
 for i=1:N % Forward pass
-    EST(i:end)=max(dsm(:,i:end).*EFT(:))'; % EST calculated step by step
+    EST(i:end)=max(dsm(:,i:end).*EFT)'; % EST calculated step by step
     EFT(i:end)=EST(i:end)+T(i:end); % EFTi=ESTi+Ti (i=1..N)
 end
 
@@ -48,9 +48,8 @@ TPT=max(EFT); % TPT is the makespan of the longest path
 LFT=repmat(TPT,N,1); % LFTi=TPT (i=1..N)
 LST=LFT-T; % LSTi=LFTi-Ti (i=1..N)
 dsm_t = transpose(dsm); % Transpose before loop
-TPTDSM=(dsm_t.*LST)'; % Preallocate doing the first step, start with second loop
 
-for i=N:-2:1 % Backward pass
+for i=N:-1:1 % Backward pass
     TPTDSM(i:-1:1,i:-1:1)=(dsm_t(i:-1:1,i:-1:1).*LST(i:-1:1))'; % Calculate LST step by step
     TPTDSM(isnan(TPTDSM) | TPTDSM == 0) = TPT; % Independent tasks' LFT = TPT
     LFT=min(TPTDSM,[],2); % Calculate LFT
