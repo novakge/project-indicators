@@ -1,27 +1,4 @@
 % wrapper script to batch run all (multi)project indicators for the different flexibility factors
-%
-% +---------------------------------------------+--------+-------+
-% |  	  		   		Indicator				| Global | Local |
-% +---------------------------------------------+--------+-------+
-% | C, CNC, OS									|    X   |   X   | // differs for local and global
-% | I1,I2,I3,I4,I5,I6							|    X   |   X   | // differs for local and global
-% | alpha_I1, alpha_I2							|    X   |   X   | // differs for local and global
-% | Gini										|    X   |       | // only global
-% | XDENSITY, TDENSITY							|        |   X   | // TDENSITY global=local, XDENSITY differs locally
-% | XDUR,VADUR									|    X   |       | // XDUR global=local, VADUR global~local
-% | NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R	|    X   |   X   | // test if the same, then global
-% | MAXCPL,NFREESLK,PCTFREESLK,XFREESLK			|    X   |   X   | // test if the same, then global
-% | ARLF,NARLF,NARLF_'                          |    X   |   X   | // uses both global and local infos already
-% | RF,RU,PCTR,DMND,XDMND,RS,RC,UTIL,XUTIL		|    X   |   X   | // test if the same, then global
-% | TCON,XCON,OFACT,TOTOFACT,UFACT,TOTUFACT		|    X   |   X   | // test if the same, then global
-% | alpha_RS									|        |   X   | // only local
-% | fr,sr										|    X   |   X   | // global=local (for sure)
-% | ap, comps, degrees                          |    X   |   X   | // global!=local
-% +---------------------------------------------+--------+-------+
-
-% original order from previous results XLS
-% type,filename,c,cnc,XDUR,VADUR,os,NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK,tdensity,xdensity,fr,sr,ff,num_modes,num_activities,num_r_resources,rf,mean(ru),ru,mean(pctr),pctr,mean(dmnd),dmnd,mean(rs),rs,mean(rc),rc,mean(util),util,mean(tcon),tcon,ofact,ufact,database
-% proposed new order, see below
 
 clear % clear all obsolete variables
 
@@ -418,39 +395,3 @@ status = fclose(data); % close result file and get the status of the operation
 
 % optionally replace dot with comma (instance name)
 % system(strcat('convert-dot.bat' + " " + results));
-
-%% Changelog
-% - maximin, minimax support added
-% - new order with extended indicators for multiproject;
-% - some resource average (xdmnd, xutil, xcon) now calculated inside
-% - average resource indicators named as X[...]
-% - added totofact, totufact
-% - keep fr, sr, ff (not slack-FF)
-% - add TPT_max information for multiproject UTIL calculation when separate PDMs are calculated
-
-
-%% Notes, remarks
-% UF = MAUF = UTIL, when calculated for the superset DSM (TPT_max given). In Van Eynde (2020), UF calculated seemingly for the 1st resource and somewhat differs from this calculation.
-
-%% Further planned indicators are:
-% IS Independence Strength
-% a_IS variation of IS
-% varUF (variance of UF) or VA-UTIL (but differs)
-
-%% Indicators not applied
-% MP Multi-project Parallellity
-% MF Multi-project Float
-% CR = ?
-% RD Resource Dedication
-% PD Project Dedication
-
-%% TODOs
-% idea for flexible resources (resource dedication done by Rob V. Eynde)
-% add NARLF, alphas etc. in a logical way, create new order
-% idea of combining real-world projects into multiproject or company example comparison
-% add different types of task removal (keeping precedence relations)
-% add support for MISTA
-% find out why and how to handle NaN and Inf values
-% backtest previous single project results
-% handle release dates in time and resource (schedule) related indicators (EST+release date->maintain e.g. TPT)
-% put data out in the same structure like data in (datasets in folders)
