@@ -50,9 +50,6 @@ for d=1:size(dirlist,1) % go through all directories
         release_dates = 0; % available only for multiprojects, initialize
         load(fullfile(filelist(i).folder,filelist(i).name),'PDM','constr','num_r_resources','num_modes','num_activities','sim_type','release_dates');
         
-        % check (multi)project size based on number of activities vector
-        num_projects = numel(num_activities); % can change later on with flexibility
-        
         n = sum(num_activities); % n is the total number of each projects activities, can change later on with flexibility
         r = num_r_resources; % number of renewable resources
         w = num_modes; % number of execution modes
@@ -97,6 +94,9 @@ for d=1:size(dirlist,1) % go through all directories
                     PDM_global = PDM_mode;
                     DSM_global = PDM_mode(:,1:size(PDM,1)); % number of rows is used instead of num_activities as it can be a row vector for multiprojects
                     
+                    % reset number of projects based on number of activities vector
+                    num_projects = numel(num_activities); % can change later on with flexibility
+                    
                     flex_task_values = flex_task_rand; % always reset, later tailor to the specific flexibility
                     flex_dep_values = flex_dep_rand; % always reset, later tailor to the specific flexibility
                     
@@ -140,6 +140,7 @@ for d=1:size(dirlist,1) % go through all directories
                     
                     % re-count number of tasks remaining for each original project after flexible ones will be removed based on original structure
                     num_activities_flex = []; % reset every loop to avoid leftovers at original indices when projects are removed
+                               
                     for j=1:num_projects
                         num_activities_flex(j) = nnz(diag(PDM_global(prj_starts(j):prj_ends(j),prj_starts(j):prj_ends(j))));
                     end
@@ -368,9 +369,14 @@ for d=1:size(dirlist,1) % go through all directories
                     
                     % save each generated instance
                     fp = ff(k); % copy to single variable for matlab save
+
+                    PDM = PDM_global; % keep name standard in MAT file
+                    num_activities = num_activities_flex; % keep name standard in MAT file
+                    num_projects = num_projects_flex; % keep name standard in MAT file
+                    
                     [~,fname]=fileparts(filelist(i).name); % get filename without extension to construct meaningful a filename
                     [~,~] = mkdir(dir_gen,strcat(string(folder_mirror(end-1)),'_gen')); % create dir for generated instances, ignore if existing or empty
-                    save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_',substruct_type(s),'_fp',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM_global','constr','num_r_resources','num_modes','num_activities_flex','num_projects_flex','sim_type','release_dates','ffact');
+                    save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_',substruct_type(s),'_fp',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM','constr','num_r_resources','num_modes','num_activities','num_projects','sim_type','release_dates','fp');
                     
                 end % loop flexibility factors
                 
