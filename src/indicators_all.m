@@ -22,11 +22,11 @@ data = fopen(results,'w');
 % parameters
 rng = 123; % initialize random seed for reproducibility
 substruct_type = ["maximal","maximin","minimax","minimal"]; % pre-defined flexible->fixed structures
-ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array
+ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array (containing flexibility parameters - fp)
 
 
 % start to store header in file
-fprintf(data,'type;subtype;filename;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;TOTSLACK_R;MAXCPL;NFREESLK;PCTFREESLK;XFREESLK;tdensity;xdensity;fr;sr;ff;num_modes;num_activities;num_r_resources;rf;mean(ru);ru;mean(pctr);pctr;xdmnd;dmnd;mean(rs);rs;mean(rc);rc;xutil;util;xcon;tcon;totofact;ofact;ufact;totufact;database;');
+fprintf(data,'type;subtype;filename;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;TOTSLACK_R;MAXCPL;NFREESLK;PCTFREESLK;XFREESLK;tdensity;xdensity;fr;sr;fp;num_modes;num_activities;num_r_resources;rf;mean(ru);ru;mean(pctr);pctr;xdmnd;dmnd;mean(rs);rs;mean(rc);rc;xutil;util;xcon;tcon;totofact;ofact;ufact;totufact;database;');
 % extended indicators list
 fprintf(data,'num_projects;sum(num_activities);a_RS;alpha_i1;alpha_i2;arlf;narlf;narlf_;c_total;cnc_total;DMND_total;gini;gini_total;i1;i1_total;i2;i2_total;i3;i3_total;i4;i4_total;i5;i5_total;i6;i6_total;MAXCPL_total;NFREESLK_total;NSLACK_total;OFACT_total;os_total;PCTFREESLK_total;mean(PCTR_total);PCTR_total;PCTSLACK_total;mean(RC_total);RC_total;RF_total;mean(RS_total);RS_total;mean(RU_total);RU_total;TCON_total;tdensity_total;TOTOFACT_total;TOTSLACK_R_total;TOTUFACT_total;UFACT_total;UTIL_total;VADUR_total;XCON_total;xdensity_total;XDMND_total;XDUR_total;XFREESLK_total;XPCTR_total;XRC_total;XRS_total;XRU_total;XSLACK_R_total;XSLACK_total;XUTIL_total;');
 % extended list with mean values
@@ -300,7 +300,7 @@ for d=1:size(dirlist,1) % go through all directories
                     % global calculations
                     % resource related
                     [arlf,narlf,narlf_] = indicator_narlf(PDM_global, num_activities_flex, num_r_resources, release_dates_flex);
-                    % TODO test if global vs local differs, if not, keep global and note in overview ascii table
+                    % global vs local calculation might differ
                     [RF_total,RU_total,PCTR_total,DMND_total,XDMND_total,RS_total,RC_total,UTIL_total,XUTIL_total,TCON_total,XCON_total,OFACT_total,TOTOFACT_total,UFACT_total,TOTUFACT_total] = indicators_resource(PDM_global,num_r_resources,constr); % TPT_max information is not needed as the DSM superset is given
                     % calculate a_RS from individual values here before averaging
                     a_RS = alphadist(RS_total);
@@ -367,10 +367,10 @@ for d=1:size(dirlist,1) % go through all directories
                     fprintf(data,'\n'); % end with a newline
                     
                     % save each generated instance
-                    ffact = ff(k); % copy to single variable for matlab save
+                    fp = ff(k); % copy to single variable for matlab save
                     [~,fname]=fileparts(filelist(i).name); % get filename without extension to construct meaningful a filename
                     [~,~] = mkdir(dir_gen,strcat(string(folder_mirror(end-1)),'_gen')); % create dir for generated instances, ignore if existing or empty
-                    save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_',substruct_type(s),'_ff',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM_global','constr','num_r_resources','num_modes','num_activities_flex','num_projects_flex','sim_type','release_dates','ffact');
+                    save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_',substruct_type(s),'_fp',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM_global','constr','num_r_resources','num_modes','num_activities_flex','num_projects_flex','sim_type','release_dates','ffact');
                     
                 end % loop flexibility factors
                 
