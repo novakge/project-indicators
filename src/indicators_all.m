@@ -61,6 +61,7 @@ for d=1:size(dirlist,1) % go through all directories
         % calculate initial start-end offset of each project based on number of activities
         prj_starts = cumsum([1,num_activities(1:end-1)]); % starting with 1 for the first project, ignoring last entry
         prj_ends = cumsum(num_activities(1:end));
+        DSM_global = PDM(:,1:size(PDM,1)); % DSM will be the same for all modes
         
         % generating flexibility for all defined structures
         % random (uniform) generation for all potential (=1) tasks/dependencies between [0,1]
