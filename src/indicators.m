@@ -54,7 +54,7 @@ for i=1:m-1
     D=D+W(i)*W(i+1);
 end
 if ((D>n-W(1)))
-    i4=(arclengths(dsm,1)-n+W(1))/(D-n+W(1));
+    i4=(arclengths(dsm,1,L)-n+W(1))/(D-n+W(1));
 end
 
 %% I5: also known as LA: Length of Long Arcs indicator.
@@ -63,12 +63,12 @@ i5=1;
 if A~=n-W(1)
     NL=0;
     for l=2:m-1
-        NL=NL+arclengths(dsm,l)*(m-l-1)/(m-2);
+        NL=NL+arclengths(dsm,l,L)*(m-l-1)/(m-2);
     end
-    i5=(NL+arclengths(dsm,1)-n+W(1))/(A-n+W(1));
+    i5=(NL+arclengths(dsm,1,L)-n+W(1))/(A-n+W(1));
 end
 
-%% I6: also known as TF: Topological Float indicator
+%% I6: also known as TF: Topological Float indicator.
 % Reference: Vanhoucke et al. (2008).
 i6=0;
 if ((m>1)&&(m<n))

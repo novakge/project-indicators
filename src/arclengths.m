@@ -1,7 +1,6 @@
-function nl=arclengths(DSM,l)
+function nl=arclengths(DSM,l,L)
 dsm=DSM(diag(DSM)==1,diag(DSM)==1);
 n=size(dsm,1);
-L=pl(dsm);
 W=L(:,1);
 nl=0;
 
