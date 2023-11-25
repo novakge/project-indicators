@@ -18,9 +18,9 @@ dsm=DSM(diag(DSM)==1,diag(DSM)==1); % remove empty tasks and their dependencies
 %% I1: also known as number of activities indicator. Vanhoucke et al.
 % Reference: Vanhoucke et al. (2008).
 i1=size(dsm,1); % number of tasks is the size of rows in DSM (nxn, logic domain, nxn)
-n=i1;
-A=numel(dsm(dsm==1))-size(dsm,1); % number of arcs
-L=pl(dsm);
+n=i1; % store as n
+A=numel(dsm(dsm==1))-n; % number of arcs
+L=pl(dsm); % calculate progressive levels
 l=L(:,1);
 m=max(l);
 

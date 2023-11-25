@@ -1,26 +1,24 @@
+% calculate progressive levels for structural indicators
 function L=pl(DSM)
-DSM=logical(triu(DSM));
-DSM(diag(DSM)==0,:)=0;
-DSM(:,diag(DSM)==0)=0;
+
+dsm=DSM;
 L=zeros(size(DSM,1),2);
 stage = 0;
-
 M=zeros(size(DSM,1),1);
-dsm=DSM(diag(DSM)==1,diag(DSM)==1);
 
 if numel(dsm)==0
 else
     if numel(dsm)==1
         M(diag(DSM)==1)=1;
     else
-        dsm=dsm-eye(size(dsm,1));
-        m=zeros(size(dsm,1),1);
-        stage=1;
-        while min(m)==0
-            r=sum(dsm)==0;
-            m(r&(m==0)')=stage;
-            dsm(r,:)=0;
-            stage=stage+1;
+        dsm=dsm-eye(size(dsm,1)); % keep only precedence relations
+        m=zeros(size(dsm,1),1); % allocate vector to store stages
+        stage=1; % start with first stage
+        while min(m)==0 % check unstaged tasks
+            r=sum(dsm)==0; % mark tasks without predecessors (cols)
+            m(r&(m==0)')=stage; % stage tasks without predecessors
+            dsm(r,:)=0; % zero all marked tasks successors (rows)
+            stage=stage+1; % check the next stage
         end
         M(diag(DSM)==1)=m;
     end
@@ -39,7 +37,7 @@ else
     else
         dsm=dsm-eye(size(dsm,1));
         m=zeros(size(dsm,1),1);
-        while stage>=1
+        while stage>=1 % check all assigned stages
             r=sum(dsm)==0;
             m(r&(m==0)')=stage;
             dsm(r,:)=0;
@@ -49,4 +47,3 @@ else
     end
 end
 L(:,2)=M;
-
