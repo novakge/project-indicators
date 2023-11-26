@@ -1,8 +1,14 @@
-% calculate various structure related indicators: I1, I2, I3, I4, I5, I6.
+% calculate various structure related indicators:
+% - I1 (num_activities)
+% - I2 (SP)
+% - I3 (AD)
+% - I4 (SA)
+% - I5 (LA)
+% - I6 (TF)
 
 % prerequisites:
 % - arclengths.m -> to calculate arc lengths
-% - pl.m -> to calculate arc lengths
+% - pl.m -> to calculate progressive/regressive levels
 
 % example input: >> load('../test_data/pat1_DSM.mat', 'DSM')
 % example usage: >> [I1,I2,I3,I4,I5,I6] = indicators(DSM)
@@ -15,8 +21,12 @@ DSM(diag(DSM)==0,:)=0; % remove all successors of empty tasks
 DSM(:,diag(DSM)==0)=0; % remove all predecessors of empty tasks
 dsm=DSM(diag(DSM)==1,diag(DSM)==1); % remove empty tasks and their dependencies
 
-%% I1: also known as number of activities indicator. Vanhoucke et al.
-% Reference: Vanhoucke et al. (2008).
+if isempty(dsm) % error if no tasks left
+    error('DSM is empty.')
+end
+
+%% I1: also known as number of activities indicator.
+% reference: Tavares et al. (1999)
 i1=size(dsm,1); % number of tasks is the size of rows in DSM (nxn, logic domain, nxn)
 n=i1; % store as n
 A=numel(dsm(dsm==1))-n; % number of arcs
@@ -25,14 +35,15 @@ l=L(:,1);
 m=max(l);
 
 %% I2: also known as SP: Serial/Parallel indicator.
-% Reference: Vanhoucke et al. (2008).
+% reference: Tavares et al. (1999)
 i2=(m-1)/(n-1);
 if n==1
     i2=1; % by definition
 end
 
 %% I3: also known as AD: Activity Distribution indicator.
-% Reference: Vanhoucke et al. (2008).
+% reference: Tavares et al. (1999) (original)
+% reference: Vanhoucke et al. (2008) (improved)
 i3=0;
 W=tabulate(l);
 W=W(:,2);
@@ -47,18 +58,19 @@ if ((m>1)&&(m<n))
 end
 
 %% I4: also known as SA: Short Arcs indicator.
-% Reference: Vanhoucke et al. (2008).
+% reference: Tavares et al. (1999)
 i4=1;
 D=0;
 for i=1:m-1
     D=D+W(i)*W(i+1);
 end
 if ((D>n-W(1)))
-    i4=(arclengths(dsm,1,L)-n+W(1))/(D-n+W(1));
+    i4=(arclengths(dsm,L,L)-n+W(1))/(D-n+W(1));
 end
 
 %% I5: also known as LA: Length of Long Arcs indicator.
-% Reference: Vanhoucke et al. (2008).
+% reference: Tavares et al. (1999) (original)
+% reference: Vanhoucke et al. (2008) (improved)
 i5=1;
 if A~=n-W(1)
     NL=0;
@@ -69,7 +81,7 @@ if A~=n-W(1)
 end
 
 %% I6: also known as TF: Topological Float indicator.
-% Reference: Vanhoucke et al. (2008).
+% reference: Vanhoucke et al. (2008).
 i6=0;
 if ((m>1)&&(m<n))
     for i=1:n

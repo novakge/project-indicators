@@ -1,5 +1,4 @@
 % calculate length of arcs for structural indicators
-
 function nl=arclengths(DSM,l,L)
 dsm=DSM(diag(DSM)==1,diag(DSM)==1);
 n=size(dsm,1);
