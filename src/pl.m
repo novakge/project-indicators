@@ -1,4 +1,6 @@
-% calculate progressive levels for structural indicators
+% calculate progressive and regressive levels for structural indicators
+% reference: Elmaghraby (1977)
+
 function L=pl(DSM)
 
 dsm=DSM;
@@ -6,6 +8,7 @@ L=zeros(size(DSM,1),2);
 stage = 0;
 M=zeros(size(DSM,1),1);
 
+%% calculate progressive levels (PL)
 if numel(dsm)==0
 else
     if numel(dsm)==1
@@ -25,6 +28,8 @@ else
 end
 L(:,1)=M;
 
+
+%% calculate regressive levels (RL)
 DSM=DSM';
 stage=stage-1;
 M=zeros(size(DSM,1),1);
