@@ -65,7 +65,7 @@ for i=1:m-1
     D=D+W(i)*W(i+1);
 end
 if ((D>n-W(1)))
-    i4=(arclengths(dsm,L,L)-n+W(1))/(D-n+W(1));
+    i4=(arclengths(dsm,1,L)-n+W(1))/(D-n+W(1));
 end
 
 %% I5: also known as LA: Length of Long Arcs indicator.
