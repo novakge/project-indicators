@@ -5,7 +5,7 @@ function L=pl(DSM)
 
 dsm=DSM;
 L=zeros(size(DSM,1),2);
-stage = 0;
+stage=0;
 M=zeros(size(DSM,1),1);
 
 %% calculate progressive levels (PL)
