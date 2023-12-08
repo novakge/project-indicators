@@ -14,12 +14,12 @@ end
 function setup(testCase)
 
 % load parsed data from *.mat file
-data = load('test_data/test_ff_1.mat', 'DSM', 'EFT', 'EST');
+data = load('../test_data/test_ff_1.mat', 'DSM', 'EFT', 'EST');
 testCase.TestData.SLACK_001_1 = data.DSM;
 testCase.TestData.SLACK_001_2 = data.EST;
 testCase.TestData.SLACK_001_3 = data.EFT;
 
-data = load('test_data/test_ff_2.mat', 'DSM', 'EFT', 'EST');
+data = load('../test_data/test_ff_2.mat', 'DSM', 'EFT', 'EST');
 testCase.TestData.SLACK_002_1 = data.DSM;
 testCase.TestData.SLACK_002_2 = data.EST;
 testCase.TestData.SLACK_002_3 = data.EFT;
