@@ -1,4 +1,7 @@
 % calculate all (multi)project indicators for the generated flexible structures and put results into a summary csv file
+% example input:
+% example usage:
+% example output:
 
 clear % clear all obsolete variables
 
@@ -6,6 +9,7 @@ clear % clear all obsolete variables
 extension_filter = '*.mat'; % select extension
 dir_in = '../results/structures/'; % where generated flexible mat files are stored
 dir_report = '../results/reports/'; % where generated flexible mat files are stored
+dir_done = '../results/done/'; % where already processed data is moved
 
 dirlist = dir(fullfile(dir_in, '**')); % get list of files and folders in any subfolder
 dirlist = dirlist([dirlist.isdir]); % keep only folders and subfolders in list
@@ -18,7 +22,7 @@ results = strcat(dir_report,'results-',currdate,'.csv');
 data = fopen(results,'w');
 
 % parameters
-rng = 123; % initialize random seed for reproducibility
+rng(123); % initialize random seed for reproducibility
 ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array (containing flexibility parameters - fp)
 
 
@@ -261,8 +265,13 @@ for d=1:size(dirlist,1) % go through all directories
             fprintf('\b\b\b\b\b[%02.f%%]',i/numel(filelist)*100);
         end
         if i==numel(filelist)
-            fprintf('\b\b\b\b\b\b\b [done]\n');
+            fprintf('\b\b\b\b\b\b\b  [done]\n');
         end
+        
+        % move processed instance to "done" folder to be able to continue if run is aborted for any reason
+        [~,~] = mkdir(dir_done,strcat(string(folder_mirror(end-1)))); % create dir, ignore if existing or empty
+        movefile(fullfile(filelist(i).folder,filelist(i).name),strcat(dir_done,string(folder_mirror(end-1))));
+
         
     end % loop files
     
