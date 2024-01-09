@@ -1,4 +1,7 @@
 % calculate all (multi)project indicators for the generated flexible structures and put results into a summary csv file
+% example input:
+% example usage:
+% example output:
 
 clear % clear all obsolete variables
 
@@ -6,6 +9,7 @@ clear % clear all obsolete variables
 extension_filter = '*.mat'; % select extension
 dir_in = '../results/structures/'; % where generated flexible mat files are stored
 dir_report = '../results/reports/'; % where generated flexible mat files are stored
+dir_done = '../results/done/'; % where already processed data is moved
 
 dirlist = dir(fullfile(dir_in, '**')); % get list of files and folders in any subfolder
 dirlist = dirlist([dirlist.isdir]); % keep only folders and subfolders in list
@@ -18,16 +22,16 @@ results = strcat(dir_report,'results-',currdate,'.csv');
 data = fopen(results,'w');
 
 % parameters
-rng = 123; % initialize random seed for reproducibility
+rng(123); % initialize random seed for reproducibility
 ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array (containing flexibility parameters - fp)
 
 
 % start to store header in file
-fprintf(data,'database;filename;struct_type;c;cnc;XDUR;VADUR;os;NSLACK;PCTSLACK;XSLACK;XSLACK_R;TOTSLACK_R;MAXCPL;NFREESLK;PCTFREESLK;XFREESLK;tdensity;xdensity;fr;sr;fp;num_modes;num_activities;num_r_resources;rf;mean(ru);ru;mean(pctr);pctr;xdmnd;dmnd;mean(rs);rs;mean(rc);rc;xutil;util;xcon;tcon;totofact;ofact;ufact;totufact;');
+fprintf(data,'database,filename,struct_type,c,cnc,XDUR,VADUR,os,NSLACK,PCTSLACK,XSLACK,XSLACK_R,TOTSLACK_R,MAXCPL,NFREESLK,PCTFREESLK,XFREESLK,tdensity,xdensity,fr,sr,fp,num_modes,num_activities,num_r_resources,rf,mean(ru),ru,mean(pctr),pctr,xdmnd,dmnd,mean(rs),rs,mean(rc),rc,xutil,util,xcon,tcon,totofact,ofact,ufact,totufact,');
 % extended indicators list
-fprintf(data,'num_projects;sum(num_activities);a_RS;alpha_i1;alpha_i2;arlf;narlf;narlf_;c_total;cnc_total;DMND_total;gini;gini_total;i1;i1_total;i2;i2_total;i3;i3_total;i4;i4_total;i5;i5_total;i6;i6_total;MAXCPL_total;NFREESLK_total;NSLACK_total;OFACT_total;os_total;PCTFREESLK_total;mean(PCTR_total);PCTR_total;PCTSLACK_total;mean(RC_total);RC_total;RF_total;mean(RS_total);RS_total;mean(RU_total);RU_total;TCON_total;tdensity_total;TOTOFACT_total;TOTSLACK_R_total;TOTUFACT_total;UFACT_total;UTIL_total;VADUR_total;XCON_total;xdensity_total;XDMND_total;XDUR_total;XFREESLK_total;XPCTR_total;XRC_total;XRS_total;XRU_total;XSLACK_R_total;XSLACK_total;XUTIL_total;');
+fprintf(data,'num_projects,sum(num_activities),a_RS,alpha_i1,alpha_i2,arlf,narlf,narlf_,c_total,cnc_total,DMND_total,gini,gini_total,i1,i1_total,i2,i2_total,i3,i3_total,i4,i4_total,i5,i5_total,i6,i6_total,MAXCPL_total,NFREESLK_total,NSLACK_total,OFACT_total,os_total,PCTFREESLK_total,mean(PCTR_total),PCTR_total,PCTSLACK_total,mean(RC_total),RC_total,RF_total,mean(RS_total),RS_total,mean(RU_total),RU_total,TCON_total,tdensity_total,TOTOFACT_total,TOTSLACK_R_total,TOTUFACT_total,UFACT_total,UTIL_total,VADUR_total,XCON_total,xdensity_total,XDMND_total,XDUR_total,XFREESLK_total,XPCTR_total,XRC_total,XRS_total,XRU_total,XSLACK_R_total,XSLACK_total,XUTIL_total,');
 % extended list with mean values
-fprintf(data,'mean(c);mean(cnc);mean(XDUR);mean(VADUR);mean(os);mean(NSLACK);mean(PCTSLACK);mean(XSLACK);mean(XSLACK_R);mean(TOTSLACK_R);mean(MAXCPL);mean(NFREESLK);mean(XFREESLK);mean(tdensity);mean(xdensity);mean(RF);mean(XDMND);mean(XUTIL);mean(XCON);mean(TOTOFACT);mean(OFACT);mean(UFACT);mean(TOTUFACT);mean(DMND_total);mean(gini);mean(i2);mean(i3);mean(i4);mean(i5);mean(i6);mean(OFACT_total);mean(UFACT_total);mean(ap);ap_total;mean(comps);comps_total;mean(degrees_total);mean(NARC);NARC_total;NARC_inter;NARC_inter_ratio;mode\n'); % stop with newline
+fprintf(data,'mean(c),mean(cnc),mean(XDUR),mean(VADUR),mean(os),mean(NSLACK),mean(PCTSLACK),mean(XSLACK),mean(XSLACK_R),mean(TOTSLACK_R),mean(MAXCPL),mean(NFREESLK),mean(XFREESLK),mean(tdensity),mean(xdensity),mean(RF),mean(XDMND),mean(XUTIL),mean(XCON),mean(TOTOFACT),mean(OFACT),mean(UFACT),mean(TOTUFACT),mean(DMND_total),mean(gini),mean(i2),mean(i3),mean(i4),mean(i5),mean(i6),mean(OFACT_total),mean(UFACT_total),mean(ap),ap_total,mean(comps),comps_total,mean(degrees_total),mean(NARC),NARC_total,NARC_inter,NARC_inter_ratio,mode\n'); % stop with newline
 
 
 for d=1:size(dirlist,1) % go through all directories
@@ -231,28 +235,28 @@ for d=1:size(dirlist,1) % go through all directories
         % write variables in defined order to a csv file, print results into file
         
         % section #1
-        fprintf(data,'%s;%s;%s;[%s];[%s];[%s];[%s];[%s];', dirlist(d).name, filelist(i).name, struct_type, num2str(c), num2str(cnc), num2str(XDUR), num2str(VADUR), num2str(os));
-        fprintf(data,'[%s];[%s];[%s];[%s];[%s];[%s];[%s];[%s];[%s];', num2str(NSLACK), num2str(PCTSLACK), num2str(XSLACK), num2str(XSLACK_R), num2str(TOTSLACK_R), num2str(MAXCPL), num2str(NFREESLK), num2str(PCTFREESLK), num2str(XFREESLK));
-        fprintf(data,'[%s];[%s];%s;%s;%s;%s;[%s];', num2str(tdensity), num2str(xdensity), num2str(fr), num2str(sr), num2str(fp), num2str(num_modes), num2str(num_activities));
-        fprintf(data,'%s;[%s];%s;[%s];%s;[%s];[%s];[%s];%s;[%s];%s;[%s];', num2str(num_r_resources), num2str(RF), num2str(mean(cell2mat(RU(:)))), num2str(cellfun(@mean, RU)), num2str(mean(cell2mat(PCTR(1,:)))), num2str(mean(cell2mat(PCTR(:)))), num2str(XDMND), num2str(cell2mat(DMND)), num2str(XRS_total), num2str(cell2mat(RS)), num2str(XRC_total), num2str(cell2mat(RC)));
-        fprintf(data,'[%s];[%s];[%s];[%s];[%s];[%s];[%s];[%s];', num2str(XUTIL), num2str(cell2mat(UTIL)), num2str(XCON), num2str(cell2mat(TCON)), num2str(TOTOFACT), num2str(cell2mat(OFACT)), num2str(cell2mat(UFACT)), num2str(TOTUFACT));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,', dirlist(d).name, filelist(i).name, struct_type, mat2str(c), mat2str(cnc), mat2str(XDUR), mat2str(VADUR), mat2str(os));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(NSLACK), mat2str(PCTSLACK), mat2str(XSLACK), mat2str(XSLACK_R), mat2str(TOTSLACK_R), mat2str(MAXCPL), mat2str(NFREESLK), mat2str(PCTFREESLK), mat2str(XFREESLK));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,', mat2str(tdensity), mat2str(xdensity), mat2str(fr), mat2str(sr), mat2str(fp), mat2str(num_modes), mat2str(num_activities));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(num_r_resources), mat2str(RF), mat2str(mean(cell2mat(RU(:)))), mat2str(cellfun(@mean, RU)), mat2str(mean(cell2mat(PCTR(1,:)))), mat2str(mean(cell2mat(PCTR(:)))), mat2str(XDMND), mat2str(cell2mat(DMND)), mat2str(XRS_total), mat2str(cell2mat(RS)), mat2str(XRC_total), mat2str(cell2mat(RC)));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(XUTIL), mat2str(cell2mat(UTIL)), mat2str(XCON), mat2str(cell2mat(TCON)), mat2str(TOTOFACT), mat2str(cell2mat(OFACT)), mat2str(cell2mat(UFACT)), mat2str(TOTUFACT));
         
         % section #2
-        fprintf(data,'%s;%s;%s;%s;%s;', num2str(num_projects), num2str(sum(num_activities)),num2str(a_RS),num2str(alpha_i1),num2str(alpha_i2));
-        fprintf(data,'%s;%s;%s;%s;%s;[%s];', num2str(arlf),num2str(narlf),num2str(narlf_),num2str(c_total),num2str(cnc_total),num2str(DMND_total));
-        fprintf(data,'%s;%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;[%s];%s;', num2str(gini),num2str(gini_total),num2str(i1),num2str(i1_total),num2str(i2),num2str(i2_total),num2str(i3),num2str(i3_total),num2str(i4),num2str(i4_total),num2str(i5),num2str(i5_total),num2str(i6),num2str(i6_total));
-        fprintf(data,'%s;%s;%s;[%s];%s;%s;%s;[%s];%s;%s;[%s];', num2str(MAXCPL_total),num2str(NFREESLK_total),num2str(NSLACK_total),num2str(OFACT_total),num2str(os_total),num2str(PCTFREESLK_total),num2str(mean(PCTR_total)),num2str(PCTR_total),num2str(PCTSLACK_total),num2str(mean(RC_total)),num2str(RC_total));
-        fprintf(data,'%s;%s;[%s];%s;[%s ];[%s];%s;%s;%s;%s;[%s];[%s];', num2str(RF_total),num2str(mean(RS_total)),num2str(RS_total),num2str(mean(RU_total)),num2str(RU_total),num2str(TCON_total),num2str(tdensity_total),num2str(TOTOFACT_total),num2str(TOTSLACK_R_total),num2str(TOTUFACT_total),num2str(UFACT_total),num2str(UTIL_total));
-        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;', num2str(VADUR_total),num2str(XCON_total),num2str(xdensity_total),num2str(XDMND_total),num2str(XDUR_total),num2str(XFREESLK_total),num2str(XPCTR_total),num2str(XRC_total),num2str(XRS_total),num2str(XRU_total),num2str(XSLACK_R_total),num2str(XSLACK_total),num2str(XUTIL_total));
+        fprintf(data,'%s,%s,%s,%s,%s,', mat2str(num_projects), mat2str(sum(num_activities)),mat2str(a_RS),mat2str(alpha_i1),mat2str(alpha_i2));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,', mat2str(arlf),mat2str(narlf),mat2str(narlf_),mat2str(c_total),mat2str(cnc_total),mat2str(DMND_total));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(gini),mat2str(gini_total),mat2str(i1),mat2str(i1_total),mat2str(i2),mat2str(i2_total),mat2str(i3),mat2str(i3_total),mat2str(i4),mat2str(i4_total),mat2str(i5),mat2str(i5_total),mat2str(i6),mat2str(i6_total));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(MAXCPL_total),mat2str(NFREESLK_total),mat2str(NSLACK_total),mat2str(OFACT_total),mat2str(os_total),mat2str(PCTFREESLK_total),mat2str(mean(PCTR_total)),mat2str(PCTR_total),mat2str(PCTSLACK_total),mat2str(mean(RC_total)),mat2str(RC_total));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(RF_total),mat2str(mean(RS_total)),mat2str(RS_total),mat2str(mean(RU_total)),mat2str(RU_total),mat2str(TCON_total),mat2str(tdensity_total),mat2str(TOTOFACT_total),mat2str(TOTSLACK_R_total),mat2str(TOTUFACT_total),mat2str(UFACT_total),mat2str(UTIL_total));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(VADUR_total),mat2str(XCON_total),mat2str(xdensity_total),mat2str(XDMND_total),mat2str(XDUR_total),mat2str(XFREESLK_total),mat2str(XPCTR_total),mat2str(XRC_total),mat2str(XRS_total),mat2str(XRU_total),mat2str(XSLACK_R_total),mat2str(XSLACK_total),mat2str(XUTIL_total));
         
         % section #3 for mean values
-        fprintf(data,'%s;%s;%s;%s;%s;', num2str(mean(c)), num2str(mean(cnc)), num2str(mean(XDUR)), num2str(mean(VADUR)), num2str(mean(os)));
-        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;', num2str(mean(NSLACK)), num2str(mean(PCTSLACK)), num2str(mean(XSLACK)), num2str(mean(XSLACK_R)), num2str(mean(TOTSLACK_R)), num2str(mean(MAXCPL)), num2str(mean(NFREESLK)), num2str(mean(XFREESLK)));
-        fprintf(data,'%s;%s;', num2str(mean(tdensity)), num2str(mean(xdensity)));
-        fprintf(data,'%s;%s;', num2str(mean(RF)), num2str(mean(XDMND)));
-        fprintf(data,'%s;%s;%s;%s;%s;%s;', num2str(mean(XUTIL)), num2str(mean(XCON)), num2str(mean(TOTOFACT)), num2str(mean(cell2mat(OFACT))), num2str(mean(cell2mat(UFACT))), num2str(mean(TOTUFACT)));
-        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;', num2str(mean(DMND_total)), num2str(mean(gini)), num2str(mean(i2)),num2str(mean(i3)),num2str(mean(i4)),num2str(mean(i5)),num2str(mean(i6)));
-        fprintf(data,'%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s', num2str(mean(OFACT_total)), num2str(mean(UFACT_total)),num2str(mean(ap)),num2str(ap_total),num2str(mean(comps)),num2str(comps_total),num2str(degrees_total),num2str(mean(narc)),num2str(narc_total),num2str(narc_inter),num2str(narc_inter_ratio),num2str(mode));
+        fprintf(data,'%s,%s,%s,%s,%s,', mat2str(mean(c)), mat2str(mean(cnc)), mat2str(mean(XDUR)), mat2str(mean(VADUR)), mat2str(mean(os)));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,', mat2str(mean(NSLACK)), mat2str(mean(PCTSLACK)), mat2str(mean(XSLACK)), mat2str(mean(XSLACK_R)), mat2str(mean(TOTSLACK_R)), mat2str(mean(MAXCPL)), mat2str(mean(NFREESLK)), mat2str(mean(XFREESLK)));
+        fprintf(data,'%s,%s,', mat2str(mean(tdensity)), mat2str(mean(xdensity)));
+        fprintf(data,'%s,%s,', mat2str(mean(RF)), mat2str(mean(XDMND)));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,', mat2str(mean(XUTIL)), mat2str(mean(XCON)), mat2str(mean(TOTOFACT)), mat2str(mean(cell2mat(OFACT))), mat2str(mean(cell2mat(UFACT))), mat2str(mean(TOTUFACT)));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,', mat2str(mean(DMND_total)), mat2str(mean(gini)), mat2str(mean(i2)),mat2str(mean(i3)),mat2str(mean(i4)),mat2str(mean(i5)),mat2str(mean(i6)));
+        fprintf(data,'%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s', mat2str(mean(OFACT_total)), mat2str(mean(UFACT_total)),mat2str(mean(ap)),mat2str(ap_total),mat2str(mean(comps)),mat2str(comps_total),mat2str(degrees_total),mat2str(mean(narc)),mat2str(narc_total),mat2str(narc_inter),mat2str(narc_inter_ratio),mat2str(mode));
         
         % close
         fprintf(data,'\n'); % end file with a newline
@@ -261,8 +265,13 @@ for d=1:size(dirlist,1) % go through all directories
             fprintf('\b\b\b\b\b[%02.f%%]',i/numel(filelist)*100);
         end
         if i==numel(filelist)
-            fprintf('\b\b\b\b\b\b\b [done]\n');
+            fprintf('\b\b\b\b\b\b\b  [done]\n');
         end
+        
+        % move processed instance to "done" folder to be able to continue if run is aborted for any reason
+        [~,~] = mkdir(dir_done,strcat(string(folder_mirror(end-1)))); % create dir, ignore if existing or empty
+        movefile(fullfile(filelist(i).folder,filelist(i).name),strcat(dir_done,string(folder_mirror(end-1))));
+
         
     end % loop files
     
