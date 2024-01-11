@@ -27,21 +27,21 @@ testCase.TestData.GENPDM_003 = [1, 1, 1, 0, 0, 0; % n=max
 end
 
 function test_GENPDM_001(testCase)
-[PDM,num_activities,~,~,~] = genpdm(1,1,1,1,1,1,[0,1],[0,1]);
+[PDM,num_activities,~,~,~] = genpdm(0,1,1,1,1,1,[0,1],[0,1]);
 actSolution = PDM;
 expSolution = testCase.TestData.GENPDM_001;
 verifyEqual(testCase,actSolution,expSolution,'AbsTol',0.001)
 end
 
 function test_GENPDM_002(testCase)
-[PDM,num_activities,~,~,~] = genpdm(7,1,1,2,1,1,[0,1],[0,1]);
+[PDM,num_activities,~,~,~] = genpdm(1,1,1,2,1,1,[0,1],[0,1]);
 actSolution = PDM;
 expSolution = testCase.TestData.GENPDM_002;
 verifyEqual(testCase,actSolution,expSolution,'AbsTol',0.001)
 end
 
 function test_GENPDM_003(testCase)
-[PDM,num_activities,~,~,~] = genpdm(63,1,1,3,1,1,[0,1],[0,1]);
+[PDM,num_activities,~,~,~] = genpdm(7,1,1,3,1,1,[0,1],[0,1]);
 actSolution = PDM;
 expSolution = testCase.TestData.GENPDM_003;
 verifyEqual(testCase,actSolution,expSolution,'AbsTol',0.001)
