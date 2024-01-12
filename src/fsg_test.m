@@ -9,20 +9,21 @@ function setupOnce(testCase)
 % setup global stuff
 
 % data template (name,type,size_min,size_max,value_range)
-testCase.TestData.var_data = {  'constr','double',          [1,3], [1,Inf],   [-1,Inf];  ... % [Ct=1,Cc=1,{Cq=1},{Cr=r},Cs=1]
-                                'sim_type','double',        [1,1], [1,1],     [1,3];     ... % 1, 2, 3
-                                'struct_type','string',     [1,1], [1,1],     [0,7];     ... % maximal, maximin, minimax, minimal
-                                'release_dates','double',   [1,1], [1,Inf],   [0,Inf];   ... % 0...n,...,0...n
-                                'num_projects','double',    [1,1], [1,1],     [1,Inf];   ... % 1...n
-                                'num_activities','double',  [1,1], [1,Inf],   [1,Inf];   ... % 1...n,...,1...n
-                                'num_r_resources','double', [1,1], [1,Inf],   [0,Inf];   ... % 0...n
-                                'num_modes','double',       [1,1], [1,1],     [1,Inf];   ... % 1...w
-                                'PDM','double',             [1,1], [Inf,Inf], [0,Inf];   ... % 0...
-                                'mode','double',            [1,1], [1,1],     [1,Inf];   ... % 1...w
-                                'fr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
-                                'sr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
-                                'fp','double',              [1,1], [1,1],     [0.0,0.4]; ... % 0, 0.1, 0.2, 0.3, 0.4
-                                };
+testCase.TestData.var_data = { ...
+    'constr','double',          [1,3], [1,Inf],   [-1,Inf];  ... % [Ct=1,Cc=1,{Cq=1},{Cr=r},Cs=1]
+    'sim_type','double',        [1,1], [1,1],     [1,3];     ... % 1, 2, 3
+    'struct_type','string',     [1,1], [1,1],     [0,7];     ... % maximal, maximin, minimax, minimal
+    'release_dates','double',   [1,1], [1,Inf],   [0,Inf];   ... % 0...n,...,0...n
+    'num_projects','double',    [1,1], [1,1],     [1,Inf];   ... % 1...n
+    'num_activities','double',  [1,1], [1,Inf],   [1,Inf];   ... % 1...n,...,1...n
+    'num_r_resources','double', [1,1], [1,Inf],   [0,Inf];   ... % 0...n
+    'num_modes','double',       [1,1], [1,1],     [1,Inf];   ... % 1...w
+    'PDM','double',             [1,1], [Inf,Inf], [0,Inf];   ... % 0...
+    'mode','double',            [1,1], [1,1],     [1,Inf];   ... % 1...w
+    'fr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
+    'sr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
+    'fp','double',              [1,1], [1,1],     [0.0,0.4]; ... % 0, 0.1, 0.2, 0.3, 0.4
+    };
 
 testCase.TestData.var_count = length(testCase.TestData.var_data);
 
@@ -156,7 +157,7 @@ for i = 1:numel(testCase.TestData.filenames) % go through files
     
     for j = 1:length(testCase.TestData.var_data)
         varsize = size(act.(testCase.TestData.var_data{j,1})); % get size of selected variable
-
+        
         min_range = testCase.TestData.var_data{j,3}; % get defined min range
         max_range = testCase.TestData.var_data{j,4}; % get defined max range
         
@@ -208,7 +209,7 @@ for i = 1:numel(testCase.TestData.filenames) % go through files
     
     for j = 1:length(testCase.TestData.var_data)
         var_values = act.(testCase.TestData.var_data{j,1}); % get values of selected variable
-       
+        
         exp = false; % start ok
         
         if isnumeric(var_values) % skip strings etc.
@@ -230,11 +231,28 @@ for i = 1:numel(testCase.TestData.filenames) % go through files
 end
 end
 
-% MAYBE
-% plausibility / consistency checks between variables, e.g. higher fp means less or equal tasks
-% visualization, summary, indicators/measures
-% sample check
-% metadata check
+% check matrix size based on other variables
+function test_FSG_010(testCase)
+import matlab.unittest.constraints.IsLessThanOrEqualTo
+import matlab.unittest.constraints.IsGreaterThanOrEqualTo
+
+for i = 1:numel(testCase.TestData.filenames) % go through files
+    
+    vars = load(string(strcat(testCase.TestData.dir_out,testCase.TestData.filenames(1,i))));
+    
+    n = sum(vars.num_activities); % get number of activities
+    w = vars.mode;  % get actual mode
+    r = vars.num_r_resources; % get number of renewable resources
+    
+    verifyEqual(testCase, size(vars.PDM,2), (n+w*r+2), 'AbsTol', 0.001); % check col size
+    verifyEqual(testCase, size(vars.PDM,1), (n), 'AbsTol', 0.001); % check row size
+    
+    
+    testCase.verifyThat(size(vars.constr,2),IsLessThanOrEqualTo((2+r+1+(1)))); % check constr size: [Ct=1,Cc=1,{Cq=1},{Cr=r},Cs=1]
+    testCase.verifyThat(size(vars.constr,2),IsGreaterThanOrEqualTo((2+r+1))); % check constr size: [Ct=1,Cc=1,{Cq=1},{Cr=r},Cs=1]
+
+end
+end
 
 % ... add further tests here
 
