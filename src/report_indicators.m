@@ -48,6 +48,12 @@ for d=1:size(dirlist,1) % go through all directories
         
         % load variables from next file
         release_dates = 0; % available only for multiprojects, initialize
+        % initialize variables not existing in fix structures
+        struct_type = "maximal"; % original
+        fp=0; % fix
+        sr=0; % fix
+        fr=0; % fix
+        mode=0; % all
         load(fullfile(filelist(i).folder,filelist(i).name),'PDM','constr','num_r_resources','num_modes','num_activities','sim_type','release_dates','fp','sr','fr','struct_type','mode');
         
         % get number of projects based on number of activities vector
