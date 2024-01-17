@@ -19,7 +19,7 @@ testCase.TestData.var_data = { ...
     'num_r_resources','double', [1,1], [1,Inf],   [0,Inf];   ... % 0...n
     'num_modes','double',       [1,1], [1,1],     [1,Inf];   ... % 1...w
     'PDM','double',             [1,1], [Inf,Inf], [0,Inf];   ... % 0...
-    'mode','double',            [1,1], [1,1],     [1,Inf];   ... % 1...w
+    'mode','double',            [1,1], [1,1],     [0,Inf];   ... % 0...w
     'fr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
     'sr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
     'fp','double',              [1,1], [1,1],     [0.0,0.4]; ... % 0, 0.1, 0.2, 0.3, 0.4
@@ -63,7 +63,8 @@ end
 function test_FSG_001(testCase)
 
 act = numel(dir(strcat(testCase.TestData.dir_out,'*.*')));
-exp = 2+13; % pre-calculated by equation, including "." and ".."
+act = act-2; % remove entries "." and ".."
+exp = 1+1+3*5; % pre-calculated by equation, excluding "." and ".."
 
 verifyEqual(testCase, act, exp, 'AbsTol', 0.001);
 
@@ -241,7 +242,13 @@ for i = 1:numel(testCase.TestData.filenames) % go through files
     vars = load(string(strcat(testCase.TestData.dir_out,testCase.TestData.filenames(1,i))));
     
     n = sum(vars.num_activities); % get number of activities
-    w = vars.mode;  % get actual mode
+    
+    if vars.num_modes == 1
+        w = vars.num_modes; % for single mode, select first mode by default
+    else
+        w = vars.mode;  % get actual mode
+    end
+    
     r = vars.num_r_resources; % get number of renewable resources
     
     verifyEqual(testCase, size(vars.PDM,2), (n+w*r+2), 'AbsTol', 0.001); % check col size
