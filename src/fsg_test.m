@@ -64,7 +64,7 @@ function test_FSG_001(testCase)
 
 act = numel(dir(strcat(testCase.TestData.dir_out,'*.*')));
 act = act-2; % remove entries "." and ".."
-exp = 1+1+3*5; % pre-calculated by equation, excluding "." and ".."
+exp = 1+1+3*4; % pre-calculated by equation, excluding "." and ".."
 
 verifyEqual(testCase, act, exp, 'AbsTol', 0.001);
 
