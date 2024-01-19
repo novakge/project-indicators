@@ -20,8 +20,8 @@ testCase.TestData.var_data = { ...
     'num_modes','double',       [1,1], [1,1],     [1,Inf];   ... % 1...w
     'PDM','double',             [1,1], [Inf,Inf], [0,Inf];   ... % 0...
     'mode','double',            [1,1], [1,1],     [0,Inf];   ... % 0...w
-    'fr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
-    'sr','double',              [1,1], [1,1],     [0.0,1.0]; ... % 0.0...1.0
+    'fr','double',              [1,1], [1,1],     [-1.0,1.0]; ... % -1...1.0, where -1 means no dependencies
+    'sr','double',              [1,1], [1,1],     [-1.0,1.0]; ... % -1...1.0, where -1 means no tasks
     'fp','double',              [1,1], [1,1],     [0.0,0.4]; ... % 0, 0.1, 0.2, 0.3, 0.4
     };
 
