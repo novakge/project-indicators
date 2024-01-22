@@ -19,7 +19,7 @@ dirlist(tf) = []; % remove current and parent directory
 
 % parameters
 rng(123); % fix random seed for reproducibility
-struct_type = ["maximal","maximin","minimax","minimal"]; % pre-defined flexible->fixed structures
+struct_type = ["original","maximal","maximin","minimax","minimal"]; % pre-defined flexible->fixed structures
 ff = [0,0.1,0.2,0.3,0.4]; % flexibility factors array (containing flexibility parameters - fp)
 
 for d=1:size(dirlist,1) % go through all directories
@@ -58,6 +58,8 @@ for d=1:size(dirlist,1) % go through all directories
         flex_task_rand = rand(1,nnz(fixed_task_indexes)); % create a vector with random numbers, i.e., maximal set of possible flexible tasks
         flex_dep_rand = rand(1,nnz(fixed_dep_indexes)); % create a vector with random numbers, i.e., maximal set of possible flexible dependencies
         
+        original_done = 0; % init/reset flag to skip further original structures
+        
         for mode=1:num_modes % select different modes
             
             % extract PDM for a given mode (time, resource)
@@ -69,15 +71,11 @@ for d=1:size(dirlist,1) % go through all directories
             
             PDM_mode = [DSM_mode TD_mode CD_mode RD_mode]; % merge to PDM
             
-            orig_done = 0; % init/reset flag to skip further original=maximal (ff=0) structures
-            
+            maximal_done = 0; % init/reset flag to skip further maximal (ff=0) structures
+                            
             for s=1:numel(struct_type) % calculate indicators for each defined structure
                 
                 for k=1:numel(ff) % calculate indicators for each flexibility factor
-                    
-                    if ((struct_type(s) == "maximal" || ff(k) == 0) && (orig_done == 1))
-                        continue; % skip maximal or original ff=0 structures after the first was already generated
-                    end
                     
                     % always reset global PDM and DSM for each flexibility version (max,maxmin,minmax,min...,etc.)
                     PDM_global = PDM_mode;
@@ -98,23 +96,56 @@ for d=1:size(dirlist,1) % go through all directories
                     
                     switch struct_type(s)
                         
-                        case "maximal" % maximal (original) case
-                            flex_task_values(flex_task_rand<=ff(k)) = 1; % tasks lower than or equal to the flexibility ratio will be included
-                            flex_dep_values(flex_dep_rand<=ff(k)) = 1; % dependencies lower than or equal to the flexibility ratio will be included
+                        case "original"
                             
-                            orig_done = 1; % keep track of original structure, do it only once
+                            if (ff(k) == 0) && (original_done == 0)
+                                
+                                PDM_global = PDM; % keep original PDM with all modes
+                                
+                                flex_task_values(flex_task_rand<=ff(k)) = 1; % tasks lower than or equal to the flexibility ratio will be included
+                                flex_dep_values(flex_dep_rand<=ff(k)) = 1; % dependencies lower than or equal to the flexibility ratio will be included
+                                original_done = 1; % keep track of original structure, do it only once
+                                
+                            else
+                                continue; % skip original structures after the first was already generated
+                            end
+                            
+                        case "maximal" % maximal case
+                            
+                            if (ff(k) == 0) && (maximal_done == 0)
+                                flex_task_values(flex_task_rand<=ff(k)) = 1; % tasks lower than or equal to the flexibility ratio will be included
+                                flex_dep_values(flex_dep_rand<=ff(k)) = 1; % dependencies lower than or equal to the flexibility ratio will be included
+                                maximal_done = 1; % keep track of maximal structure, do it only once
+                            else
+                                continue; % skip maximal ff=0 structures after each mode was already generated
+                            end
                             
                         case "maximin" % maximin case - flexible dependencies will be zeroed
-                            flex_task_values(flex_task_rand<=ff(k)) = 1; % tasks lower than or equal to the flexibility ratio will be included
-                            flex_dep_values(flex_dep_rand<=ff(k)) = 0; % dependencies lower than or equal to the flexibility ratio will be zeroed
+                            
+                            if (ff(k) > 0) % if flexibility parameter is 0, structure is equivalent to maximal (no flexible dep/task to remove) -> skip
+                            	flex_task_values(flex_task_rand<=ff(k)) = 1; % tasks lower than or equal to the flexibility ratio will be included
+                                flex_dep_values(flex_dep_rand<=ff(k)) = 0; % dependencies lower than or equal to the flexibility ratio will be zeroed
+                            else
+                                continue; % skip original structures after the first was already generated
+                            end
                             
                         case "minimax" % minimax case - flexible tasks will be zeroed
-                            flex_task_values(flex_task_rand<=ff(k)) = 0; % tasks lower than or equal to the flexibility ratio will be zeroed
-                            flex_dep_values(flex_dep_rand<=ff(k)) = 1; % dependencies lower than or equal to the flexibility ratio will be included
+                            
+                            if (ff(k) > 0) % if flexibility parameter is 0, structure is equivalent to maximal (no flexible dep/task to remove) -> skip
+                                flex_task_values(flex_task_rand<=ff(k)) = 0; % tasks lower than or equal to the flexibility ratio will be zeroed
+                                flex_dep_values(flex_dep_rand<=ff(k)) = 1; % dependencies lower than or equal to the flexibility ratio will be included
+                            else
+                                continue; % skip structure
+                            end
                             
                         case "minimal" % minimal case - flexible tasks/dependencies will be zeroed
-                            flex_task_values(flex_task_rand<=ff(k)) = 0; % tasks lower than or equal to the flexibility ratio will be zeroed
-                            flex_dep_values(flex_dep_rand<=ff(k)) = 0; % dependencies lower than or equal to the flexibility ratio will be zeroed
+                            
+                            if (ff(k) > 0) % if flexibility parameter is 0, structure is equivalent to maximal (no flexible dep/task to remove) -> skip
+                                flex_task_values(flex_task_rand<=ff(k)) = 0; % tasks lower than or equal to the flexibility ratio will be zeroed
+                                flex_dep_values(flex_dep_rand<=ff(k)) = 0; % dependencies lower than or equal to the flexibility ratio will be zeroed
+                            else
+                                continue; % skip structure
+                            end
                             
                         otherwise
                             disp('Error: undefined structure!')
@@ -160,13 +191,22 @@ for d=1:size(dirlist,1) % go through all directories
                     
                     [~,fname]=fileparts(filelist(i).name); % get filename without extension to construct meaningful a filename
                     [~,~] = mkdir(dir_gen,strcat(string(folder_mirror(end-1)),'_gen')); % create dir for generated instances, ignore if existing or empty
-                    save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_',struct_type,'_fp',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM','constr','num_r_resources','num_modes','num_activities','num_projects','sim_type','release_dates','fp','sr','fr','struct_type','mode');
+                    
+                    if struct_type == "original"
+                        mode_temp = mode; % save original mode as for original instances this will be forced to 0
+                        mode = 0; % all modes included in original, 0 means no selection
+                        save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_',struct_type,'.mat'),'PDM','constr','num_r_resources','num_modes','num_activities','num_projects','sim_type','release_dates','fp','sr','fr','struct_type','mode');
+                        mode = mode_temp; % restore mode for other structures
+                    else
+                        save(strcat(strcat(dir_gen,string(folder_mirror(end-1)),'_gen','/'),fname,'_',struct_type,'_fp',num2str(real(ff(k)*10)),'_mode',num2str(mode),'.mat'),'PDM','constr','num_r_resources','num_modes','num_activities','num_projects','sim_type','release_dates','fp','sr','fr','struct_type','mode');    
+                    end
                     
                     % restore original variables after saving
                     PDM = PDM_temp;
                     num_activities = num_activities_temp;
                     num_projects = num_projects_temp;
                     struct_type = struct_type_temp;
+                    
                     
                 end % loop flexibility factors
                 
