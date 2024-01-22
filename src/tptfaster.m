@@ -53,6 +53,7 @@ TPT_mask = (~dsm_t.*TPT)'; % Create a mask matrix to overwrite all zero with TPT
 
 for i=N:-1:1 % Backward pass
     TPTDSM(i:-1:1,i:-1:1) = (dsm_t(i:-1:1,i:-1:1) .* LST(i:-1:1))' + TPT_mask(i:-1:1,i:-1:1); % Calculate LST step by step (overwrite zeros using TPT mask and ignoring precedence relations)
+    TPTDSM(TPTDSM == 0) = TPT; % Independent tasks' LFT = TPT, leftovers possible after masking (LFT=T case)
     LFT=min(TPTDSM,[],2,'omitnan'); % Calculate LFT (logical indexing applied before)
     LST(i:-1:1)=LFT(i:-1:1)-T(i:-1:1); % LSTi=LFTi-Ti (i:=1..N)
 end
