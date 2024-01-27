@@ -57,8 +57,9 @@ if ((m>1)&&(m<n))
    i3=lambdaw/lambdamax;
 end
 
-%% I4: also known as SA: Short Arcs indicator.
-% reference: Tavares et al. (1999)
+%% I4: also known as LA: Length of Long Arcs indicator.
+% reference: Tavares et al. (1999) (original)
+% reference: Vanhoucke et al. (2008) (improved)
 i4=1;
 D=0;
 for i=1:m-1
@@ -68,9 +69,8 @@ if ((D>n-W(1)))
     i4=(arclengths(dsm,1,L)-n+W(1))/(D-n+W(1));
 end
 
-%% I5: also known as LA: Length of Long Arcs indicator.
-% reference: Tavares et al. (1999) (original)
-% reference: Vanhoucke et al. (2008) (improved)
+%% I5: also known as SA: Short Arcs indicator.
+% reference: Tavares et al. (1999)
 i5=1;
 if A~=n-W(1)
     NL=0;
