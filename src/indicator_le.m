@@ -56,7 +56,7 @@ getLinearExtensions(1:n);
 if n == 0 % no tasks, no linear extensions
     LE = 0;
 else % if there is at least 1 task
-    if sum(triu(dsm,1),'all') == 0 % no dependencies, linear extension is n factorial
+    if sum(dsm,'all') == 0 % no dependencies, linear extension is n factorial
         le = factorial(n);
     end
     
