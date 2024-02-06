@@ -45,7 +45,7 @@ r = num_r_resources; % number of renewable resources
             end
         end
         % construct PDM for the selected mode
-        PDM_mode = [DSM,TD,CD,RD]; % merge PDM with the specific modes selected
+        PDM_mode = [DSM,TD,CD,RD]; % merge PDM containing the specific mode
         
     end
 
@@ -133,6 +133,7 @@ r = num_r_resources; % number of renewable resources
     end
 
 options = optimoptions('ga','Vectorized','off', 'UseParallel',false, 'Display','off');
+intcon = 1:n; % problem using integers
 
 % set mode selection lower (first modes only) and upper bounds (last modes only)
 lb = ones(num_activities,1); % all first mode selected
@@ -141,7 +142,7 @@ ub = num_modes*ones(num_activities,1); % all w-th mode selected
 fcn_lb = @(x) indicator_wrapper(PDM,w,r,n,x,indicator); % minimize target function
 fcn_ub = @(x) -indicator_wrapper(PDM,w,r,n,x,indicator); % maximize target function
 
-intcon = 1:n;
+
 % minimize target function to reach lower bound
 opt_modes_lb=ga(fcn_lb,n,[],[],[],[],lb,ub,[],intcon,options); % n decision variables as only one mode is selected for resources and time combinations
 LB = indicator_wrapper(PDM,w,r,n,opt_modes_lb,indicator); % recalculate with optimized mode selection
