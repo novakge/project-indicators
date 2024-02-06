@@ -34,14 +34,14 @@ r = num_r_resources; % number of renewable resources
         % extract TD for the w-th mode t1 t2 ... tw
         TD = zeros(n,1);
         for i = 1:n
-            TD(i) = PDM(i,n+round(mode_selection(i))); % if it is not an integer, round the index
+            TD(i) = PDM(i,n+mode_selection(i)); % if it is not an integer, round the index
         end
         
         % extract RD for mode w: r1w1 r1w2 ... r2w1 r2w3 r2w3 ... rrww
         RD = zeros(n,r);
         for i=1:n
             for j=1:r
-                RD(i,j) = PDM(i,n+2*w+j*round(mode_selection(i)));
+                RD(i,j) = PDM(i,n+2*w+j*mode_selection(i));
             end
         end
         % construct PDM for the selected mode
@@ -132,7 +132,7 @@ r = num_r_resources; % number of renewable resources
         end
     end
 
-options = gaoptimset('Vectorized','off', 'UseParallel',false, 'Display','off'); % re-consider later, like rcpsp optimization
+options = optimoptions('ga','Vectorized','off', 'UseParallel',false, 'Display','off');
 
 % set mode selection lower (first modes only) and upper bounds (last modes only)
 lb = ones(num_activities,1); % all first mode selected
@@ -141,13 +141,13 @@ ub = num_modes*ones(num_activities,1); % all w-th mode selected
 fcn_lb = @(x) indicator_wrapper(PDM,w,r,n,x,indicator); % minimize target function
 fcn_ub = @(x) -indicator_wrapper(PDM,w,r,n,x,indicator); % maximize target function
 
-
+intcon = 1:n;
 % minimize target function to reach lower bound
-opt_modes_lb=ga(fcn_lb,n,[],[],[],[],lb,ub,[],[],options); % n decision variables as only one mode is selected for resources and time combinations
-LB = indicator_wrapper(PDM,w,r,n,round(opt_modes_lb),indicator); % recalculate with optimized mode selection
+opt_modes_lb=ga(fcn_lb,n,[],[],[],[],lb,ub,[],intcon,options); % n decision variables as only one mode is selected for resources and time combinations
+LB = indicator_wrapper(PDM,w,r,n,opt_modes_lb,indicator); % recalculate with optimized mode selection
 
 % maximize target function to reach upper bound
-opt_modes_ub=ga(fcn_ub,n,[],[],[],[],lb,ub,[],[],options); % n decision variables as only one mode is selected for resources and time combinations
-UB = indicator_wrapper(PDM,w,r,n,round(opt_modes_ub),indicator); % recalculate with optimized mode selection
+opt_modes_ub=ga(fcn_ub,n,[],[],[],[],lb,ub,[],intcon,options); % n decision variables as only one mode is selected for resources and time combinations
+UB = indicator_wrapper(PDM,w,r,n,opt_modes_ub,indicator); % recalculate with optimized mode selection
 
 end
