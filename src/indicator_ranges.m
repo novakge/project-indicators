@@ -22,11 +22,11 @@ function [LB,UB,LBmodes,UBmodes] = indicator_ranges(PDM,num_modes,num_r_resource
 % setup constants for simulation
 rng default; % for reproducibility
 
-% get constants from instance
+% simplify names of constants from instance
 num_activities = size(PDM,1); % number of rows gives total number of activities of the (multi)project
 n = double(num_activities); % rename to n
 w = num_modes; % number of completion modes
-R = num_r_resources; % number of renewable resources
+r = num_r_resources; % number of renewable resources
 
 % problem with integer constraints
 intcon = 1:n;
@@ -126,7 +126,7 @@ intcon = 1:n;
         end
     end
 
-options = optimoptions('ga','Vectorized','off', 'Display','off', 'UseParallel',true, 'CrossoverFcn',@crossoverscattered, 'MutationFcn',@mutationgaussian);
+options = optimoptions('ga', 'Vectorized','off', 'Display','off', 'UseParallel',true, 'CrossoverFcn',{@crossoverscattered}, 'MutationFcn',{@mutationgaussian});
 % options.CrossoverFraction = 0; % no crossover
 % options.CrossoverFraction = 1; % no mutation
 
@@ -134,8 +134,8 @@ options = optimoptions('ga','Vectorized','off', 'Display','off', 'UseParallel',t
 lb = ones(num_activities,1); % all first mode selected
 ub = num_modes*ones(num_activities,1); % all w-th mode selected
 
-targetfcn_lb = @(x) indicator_wrapper(PDM,w,R,n,x,indicator); % minimize target function
-targetfcn_ub = @(x) -indicator_wrapper(PDM,w,R,n,x,indicator); % maximize target function
+targetfcn_lb = @(x) indicator_wrapper(PDM,w,r,n,x,indicator); % minimize target function
+targetfcn_ub = @(x) -indicator_wrapper(PDM,w,r,n,x,indicator); % maximize target function
 
 LB = 0; % init lower bound
 UB = 0; % init upper bound
@@ -151,7 +151,7 @@ try
 catch
     LB = -1; % not found or error
 end
-LB = indicator_wrapper(PDM,w,R,n,LBmodes,indicator); % recalculate with optimized mode selection
+LB = indicator_wrapper(PDM,w,r,n,LBmodes,indicator); % recalculate with optimized mode selection
 LBtime = toc; % for debug
 
 % maximize target function to reach upper bound
@@ -161,7 +161,7 @@ try
 catch
     UB = -1; % not found or error
 end
-UB = indicator_wrapper(PDM,w,R,n,UBmodes,indicator); % recalculate with optimized mode selection
+UB = indicator_wrapper(PDM,w,r,n,UBmodes,indicator); % recalculate with optimized mode selection
 UBtime = toc; % for debug
 
 
